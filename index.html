@@ -1,118 +1,491 @@
-// ═══════════════════════════════════════════════════════
-//  CX 온보딩 커리큘럼 - Google Apps Script API
-//  개인별 체크 현황 관리 버전
-// ═══════════════════════════════════════════════════════
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CX팀 신규 온보딩 커리큘럼</title>
+<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --brand:#4a26ff;--brand-h:#3b1fe0;--brand-l:rgba(74,38,255,.08);--brand-b:rgba(74,38,255,.22);
+  --t1:#111827;--t2:#4b5563;--t3:#9ca3af;
+  --bg:#f8f7ff;--sur:#fff;--sur2:#f3f4f6;--bor:#e5e7eb;
+  --ok:#10b981;--ok-b:#ecfdf5;--ok-br:#a7f3d0;
+  --warn:#f59e0b;--warn-b:#fffbeb;
+  --sw:272px;--r:10px;--rl:14px;
+}
+body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);color:var(--t1);min-height:100vh;font-size:14px;line-height:1.6}
+.app{display:flex;min-height:100vh}
+.sb{width:var(--sw);flex-shrink:0;background:var(--brand);color:#fff;position:fixed;top:0;left:0;bottom:0;overflow-y:auto;z-index:50;display:flex;flex-direction:column}
+.sb::-webkit-scrollbar{width:3px}.sb::-webkit-scrollbar-thumb{background:rgba(255,255,255,.2);border-radius:99px}
+.sb-head{padding:22px 18px 14px}
+.sb-logo{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.sb-badge{width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800}
+.sb-lt{font-size:14px;font-weight:700}.sb-ls{font-size:11px;opacity:.58;margin-top:1px}
+.sb-welcome{background:rgba(255,255,255,.1);border-radius:12px;padding:13px;margin-bottom:4px}
+.sb-wt{font-size:14px;font-weight:700;line-height:1.4;margin-bottom:5px}
+.sb-wd{font-size:11.5px;opacity:.8;line-height:1.7}
+.sb-div{height:1px;background:rgba(255,255,255,.12);margin:12px 16px}
+.sb-sec{padding:0 14px 14px}
+.sb-slbl{font-size:10px;font-weight:700;opacity:.44;letter-spacing:.08em;text-transform:uppercase;padding:0 4px;margin-bottom:7px}
+.sb-co{background:rgba(255,255,255,.08);border-radius:10px;padding:12px;margin:0 2px 2px}
+.sb-co-nm{font-size:13px;font-weight:700;margin-bottom:4px}
+.sb-co-ds{font-size:11px;opacity:.76;line-height:1.7;margin-bottom:7px}
+.sb-tags{display:flex;flex-wrap:wrap;gap:3px}
+.sb-tag{font-size:10px;background:rgba(255,255,255,.12);border-radius:99px;padding:2px 7px}
+.sb-learn-item{display:flex;gap:7px;padding:5px 2px;font-size:11.5px;opacity:.84;align-items:flex-start;border-bottom:1px solid rgba(255,255,255,.07)}
+.sb-learn-item:last-child{border:none}
+.sb-ln{width:16px;height:16px;border-radius:50%;background:rgba(255,255,255,.15);font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.sb-nav{display:flex;align-items:center;gap:7px;padding:6px 8px;border-radius:var(--r);cursor:pointer;font-size:12.5px;font-weight:500;opacity:.7;transition:.15s;border:none;background:none;color:#fff;width:100%;text-align:left}
+.sb-nav:hover{background:rgba(255,255,255,.12);opacity:1}
+.sb-nav.done{opacity:1;color:#6ee7b7}
+.sb-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.32);flex-shrink:0;transition:.2s}
+.sb-nav.done .sb-dot{background:var(--ok)}
+.loading-bar{position:fixed;top:0;left:0;right:0;height:3px;background:rgba(74,38,255,.15);z-index:999;overflow:hidden;display:none}
+.loading-bar.on{display:block}
+.loading-bar::after{content:'';position:absolute;left:-40%;width:40%;height:100%;background:var(--brand);animation:ldbar 1s ease-in-out infinite}
+@keyframes ldbar{to{left:100%}}
+.main{margin-left:var(--sw);flex:1;display:flex;flex-direction:column;min-height:100vh}
+.topbar{background:var(--sur);border-bottom:1px solid var(--bor);padding:0 24px;height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.bc{font-size:13px;color:var(--t3);display:flex;align-items:center;gap:5px}
+.bc .cur{color:var(--t1);font-weight:600}
+.pw{display:flex;align-items:center;gap:8px}
+.pt{width:140px;height:5px;background:var(--sur2);border-radius:99px;overflow:hidden}
+.pf{height:100%;background:var(--brand);border-radius:99px;transition:width .5s;width:0%}
+.ptxt{font-size:12px;font-weight:600;color:var(--brand);white-space:nowrap}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:var(--t3);flex-shrink:0;transition:.3s}
+.sync-dot.syncing{background:var(--warn);animation:pulse .8s infinite}
+.sync-dot.synced{background:var(--ok)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.content{padding:22px 24px 80px;max-width:940px}
+.tabs{display:flex;gap:2px;border-bottom:2px solid var(--bor);margin-bottom:22px}
+.tab{padding:8px 14px;font-size:13px;font-weight:600;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:.15s;background:none;border-left:none;border-right:none;border-top:none}
+.tab.on{color:var(--brand);border-bottom-color:var(--brand)}
+.pane{display:none}.pane.on{display:block}
+.sec-h{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.sec-ico{width:30px;height:30px;border-radius:8px;background:var(--brand-l);display:flex;align-items:center;justify-content:center;font-size:14px}
+.sec-t{font-size:16px;font-weight:700}.sec-s{font-size:12px;color:var(--t3);margin-top:1px}
+section{margin-bottom:28px}
+.card{background:var(--sur);border:1px solid var(--bor);border-radius:var(--rl);padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.05);transition:.15s}
+.card:hover{box-shadow:0 4px 14px rgba(0,0,0,.07)}
+.g2{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.g4{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:9px}
+.mc{background:var(--sur);border:1px solid var(--bor);border-radius:var(--r);padding:12px 14px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.mc-l{font-size:11px;color:var(--t3);font-weight:500;margin-bottom:3px}
+.mc-v{font-size:13px;font-weight:600}
+.notice{background:var(--brand-l);border:1px solid var(--brand-b);border-radius:var(--rl);padding:14px 18px}
+.notice li{display:flex;gap:7px;font-size:13px;color:#3730a3;margin-bottom:5px;line-height:1.6;list-style:none}
+.notice li:last-child{margin:0}.notice li::before{content:'·';font-weight:700;flex-shrink:0}
+.cal{display:grid;grid-template-columns:62px repeat(5,1fr);background:var(--sur);border:1px solid var(--bor);border-radius:var(--rl);overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.05);min-width:520px}
+.ch{background:var(--sur2);padding:8px 5px;text-align:center;font-size:11px;color:var(--t3);font-weight:500;border-bottom:1px solid var(--bor)}
+.chd{background:var(--brand);color:#fff;padding:8px 5px;text-align:center;font-size:11px;font-weight:700;border-bottom:1px solid var(--bor);border-left:1px solid rgba(255,255,255,.15)}
+.ct{background:var(--sur2);border-top:1px solid var(--bor);border-right:1px solid var(--bor);padding:3px 5px;font-size:9.5px;color:var(--t3);text-align:right}
+.cc{border-top:1px solid var(--bor);border-left:1px solid var(--bor);padding:2px}
+.cb{border-radius:4px;padding:3px 5px;font-size:9.5px;font-weight:600;line-height:1.35;height:100%}
+.cb.br{background:var(--brand-l);color:var(--brand)}.cb.gy{background:var(--sur2);color:var(--t3);font-weight:400}
+.cb.ok{background:var(--ok-b);color:var(--ok)}.cb.wn{background:var(--warn-b);color:var(--warn)}
+.day-card{background:var(--sur);border:1px solid var(--bor);border-radius:var(--rl);margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.05);overflow:hidden;transition:.2s}
+.day-card:hover{box-shadow:0 4px 14px rgba(0,0,0,.07)}
+.dch{padding:14px 18px;border-bottom:1px solid var(--bor);display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;gap:10px}
+.dchl{display:flex;align-items:center;gap:10px}
+.dnum{width:34px;height:34px;border-radius:9px;background:var(--brand-l);color:var(--brand);font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.dtit{font-size:14px;font-weight:700}
+.dsub{font-size:11.5px;color:var(--t3);margin-top:2px;display:flex;align-items:center;gap:5px}
+.tr-pill{display:inline-flex;align-items:center;gap:3px;background:var(--sur2);border-radius:99px;padding:2px 7px;font-size:11px;color:var(--t2);font-weight:500}
+.dbadge{font-size:11px;font-weight:600;padding:3px 8px;border-radius:99px;background:var(--sur2);color:var(--t3);white-space:nowrap;transition:.2s}
+.dbadge.done{background:var(--ok-b);color:var(--ok)}
+.dtog{color:var(--t3);font-size:12px;transition:.2s;flex-shrink:0}
+.day-card.col .dtog{transform:rotate(-90deg)}
+.dcb{padding:6px 18px 14px}
+.day-card.col .dcb{display:none}
+.ti{display:flex;align-items:flex-start;gap:9px;padding:6px 7px;border-radius:6px;cursor:pointer;transition:.12s}
+.ti:hover{background:var(--sur2)}
+.tcb{width:16px;height:16px;border-radius:4px;border:1.5px solid var(--bor);flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:.15s;background:#fff}
+.ti.ck .tcb{background:var(--brand);border-color:var(--brand)}
+.ti.ck .tcb::after{content:'';width:8px;height:5px;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(-45deg) translateY(-1px);display:block}
+.tb{flex:1;min-width:0}
+.tt{font-size:10px;font-weight:600;color:var(--brand);margin-bottom:1px}
+.tl{font-size:13px;color:var(--t1);line-height:1.5;transition:.15s}
+.ti.ck .tl{color:var(--t3);text-decoration:line-through}
+.ttags{display:flex;flex-wrap:wrap;gap:3px;margin-top:3px}
+.ttag{font-size:10px;background:var(--brand-l);color:var(--brand);padding:1px 6px;border-radius:99px;font-weight:500}
+.tlink{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--brand);margin-top:4px;text-decoration:none;background:var(--brand-l);padding:2px 8px;border-radius:99px;font-weight:500;transition:.15s}
+.tlink:hover{background:var(--brand-b)}
+.t-break{display:flex;gap:6px;padding:4px 7px;font-size:11.5px;color:var(--t3)}
+.slack-row{display:flex;align-items:center;gap:7px;margin-top:6px;padding:9px 12px;background:#fff7ed;border:1px solid #fed7aa;border-radius:var(--r);font-size:12px;color:#92400e}
+.sl-ch{font-family:monospace;background:#fed7aa;padding:1px 5px;border-radius:4px;font-size:10.5px}
+.lib-sec{margin-bottom:18px}
+.lib-lbl{font-size:12px;font-weight:700;color:var(--t2);margin-bottom:7px;display:flex;align-items:center;gap:7px}
+.lib-lbl::after{content:'';flex:1;height:1px;background:var(--bor)}
+.lib-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:8px}
+.lib-card{background:var(--sur);border:1px solid var(--bor);border-radius:var(--r);padding:11px 13px;display:flex;align-items:flex-start;gap:8px;box-shadow:0 1px 2px rgba(0,0,0,.04);transition:.15s;text-decoration:none;color:inherit}
+.lib-card:hover{box-shadow:0 4px 12px rgba(0,0,0,.08);border-color:var(--brand-b)}
+.lib-ico{width:28px;height:28px;border-radius:7px;background:var(--brand-l);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.lib-nm{font-size:12px;font-weight:600;color:var(--t1);line-height:1.4;margin-bottom:2px}
+.lib-tp{font-size:10px;color:var(--t3)}
+.empty{text-align:center;padding:48px 20px;color:var(--t3)}
+.empty-ico{font-size:32px;margin-bottom:10px}
+.empty-t{font-size:14px;font-weight:600;margin-bottom:4px;color:var(--t2)}
+.empty-s{font-size:12.5px}
+.toast-wrap{position:fixed;bottom:24px;right:24px;z-index:999;display:flex;flex-direction:column;gap:8px}
+.toast{background:var(--t1);color:#fff;padding:10px 16px;border-radius:var(--r);font-size:12.5px;font-weight:500;box-shadow:0 4px 16px rgba(0,0,0,.15);animation:tin .25s ease;display:flex;align-items:center;gap:8px}
+.toast.ok{background:#065f46}.toast.err{background:#7f1d1d}
+@keyframes tin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+<div class="loading-bar" id="lbar"></div>
+<div class="toast-wrap" id="toastWrap"></div>
+<div class="app">
+<aside class="sb">
+  <div class="sb-head">
+    <div class="sb-logo">
+      <div class="sb-badge">CX</div>
+      <div><div class="sb-lt" id="sb-cos">아이샵케어</div><div class="sb-ls">CX Team Onboarding</div></div>
+    </div>
+    <div class="sb-welcome">
+      <div class="sb-wt">🎉 <span id="sb-name">새로운 팀원</span>님,<br>환영합니다!</div>
+      <div class="sb-wd">CX팀의 일원이 된 걸 진심으로 환영해요. 이 커리큘럼을 통해 첫 주 업무 흐름과 시스템을 빠르게 익혀봐요 😊</div>
+    </div>
+  </div>
+  <div class="sb-div"></div>
+  <div class="sb-sec">
+    <div class="sb-slbl">회사 소개</div>
+    <div class="sb-co">
+      <div class="sb-co-nm" id="sb-cof">주식회사 아이샵케어</div>
+      <div class="sb-co-ds" id="sb-cod">소상공인·자영업자를 위한 결제 솔루션 전문기업입니다.</div>
+      <div class="sb-tags"><span class="sb-tag">VAN·PG</span><span class="sb-tag">토스포스</span><span class="sb-tag">IShopCARE</span></div>
+    </div>
+  </div>
+  <div class="sb-div"></div>
+  <div class="sb-sec">
+    <div class="sb-slbl">이번 교육에서 배울 것</div>
+    <div style="padding:0 2px">
+      <div class="sb-learn-item"><div class="sb-ln">1</div><span>CX팀 업무 흐름 및 주요 시스템 이해</span></div>
+      <div class="sb-learn-item"><div class="sb-ln">2</div><span>VAN·PG·결제 장비 및 터미널 개념</span></div>
+      <div class="sb-learn-item"><div class="sb-ln">3</div><span>채널톡 상담 기준·태그·템플릿 활용</span></div>
+      <div class="sb-learn-item"><div class="sb-ln">4</div><span>토스포스 선불형·후불형 기능 운영</span></div>
+      <div class="sb-learn-item"><div class="sb-ln">5</div><span>CMS 계약조건·위약금·VAN 전산 정리</span></div>
+    </div>
+  </div>
+  <div class="sb-div"></div>
+  <div class="sb-sec">
+    <div class="sb-slbl">일별 일정</div>
+    <div id="sbNav"></div>
+  </div>
+</aside>
+<div class="main">
+  <div class="topbar">
+    <div class="bc"><span>CX 내부가이드</span><span>›</span><span class="cur">신규 온보딩 커리큘럼</span></div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <div class="pw">
+        <div class="pt"><div class="pf" id="pf"></div></div>
+        <span class="ptxt" id="ptxt">0/0</span>
+        <div class="sync-dot" id="syncDot" title="동기화 상태"></div>
+      </div>
+    </div>
+  </div>
+  <div class="content">
+    <div id="nameBanner" style="display:none;background:#fdf4ff;border:1px solid #e9d5ff;border-radius:var(--rl);padding:14px 18px;margin-bottom:12px;font-size:13px;color:#6b21a8">
+      👤 링크에 이름이 없어요! <strong>?name=이름</strong> 형식으로 접속해주세요.<br>
+      <span style="font-size:12px;opacity:.8">예시: https://youngjiyu-spec.github.io/onboarding/?name=홍길동</span>
+    </div>
+    <div id="sheetBanner" style="display:none;background:#fffbeb;border:1px solid #fcd34d;border-radius:var(--rl);padding:14px 18px;margin-bottom:20px;font-size:13px;color:#78350f">
+      ⚠️ Google Sheets가 연결되지 않았어요. <code style="background:#fef3c7;padding:1px 5px;border-radius:4px;font-size:11px">SHEET_API_URL</code> 값을 설정해주세요.
+    </div>
+    <div class="tabs">
+      <button class="tab on" onclick="sw('ov')">📋 개요</button>
+      <button class="tab" onclick="sw('sc')">📅 시간표</button>
+      <button class="tab" onclick="sw('cl')">✅ 세부일정</button>
+      <button class="tab" onclick="sw('lb')">📂 자료실</button>
+    </div>
+    <div class="pane on" id="pane-ov">
+      <section>
+        <div class="sec-h"><div class="sec-ico">🎯</div><div><div class="sec-t">교육 목표</div></div></div>
+        <div class="g2">
+          <div class="card"><div style="font-size:20px;margin-bottom:7px">🏢</div><div style="font-size:13px;font-weight:700;margin-bottom:4px">회사 & 팀 이해</div><div style="font-size:12px;color:var(--t2);line-height:1.6">IShopCARE CX팀의 역할, 조직 구조, 업무 흐름을 파악해요.</div></div>
+          <div class="card"><div style="font-size:20px;margin-bottom:7px">💳</div><div style="font-size:13px;font-weight:700;margin-bottom:4px">결제 시스템</div><div style="font-size:12px;color:var(--t2);line-height:1.6">VAN·PG 개념, 결제 장비, 터미널, CMS 계약조건을 익혀요.</div></div>
+          <div class="card"><div style="font-size:20px;margin-bottom:7px">💬</div><div style="font-size:13px;font-weight:700;margin-bottom:4px">고객 상담 운영</div><div style="font-size:12px;color:var(--t2);line-height:1.6">채널톡 상담 기준, 태그 분류, 템플릿 활용법을 실습해요.</div></div>
+          <div class="card"><div style="font-size:20px;margin-bottom:7px">🖥️</div><div style="font-size:13px;font-weight:700;margin-bottom:4px">토스포스 운영</div><div style="font-size:12px;color:var(--t2);line-height:1.6">선불형·후불형 기능, 조합별 연결 방법 등 실무 전반을 다뤄요.</div></div>
+        </div>
+      </section>
+      <section>
+        <div class="sec-h"><div class="sec-ico">📌</div><div><div class="sec-t">교육 기본 정보</div></div></div>
+        <div class="g4">
+          <div class="mc"><div class="mc-l">📅 교육 기간</div><div class="mc-v" id="m-period">불러오는 중...</div></div>
+          <div class="mc"><div class="mc-l">🕘 교육 시간</div><div class="mc-v" id="m-time">불러오는 중...</div></div>
+          <div class="mc"><div class="mc-l">📍 교육 장소</div><div class="mc-v" id="m-place">불러오는 중...</div></div>
+          <div class="mc"><div class="mc-l">👩‍🏫 담당자</div><div class="mc-v" id="m-trainers">불러오는 중...</div></div>
+          <div class="mc"><div class="mc-l">🙋 입사자</div><div class="mc-v" id="m-trainee">불러오는 중...</div></div>
+        </div>
+      </section>
+      <section>
+        <div class="sec-h"><div class="sec-ico">📋</div><div><div class="sec-t">교육 참여 안내</div></div></div>
+        <div class="notice"><ul>
+          <li>교육 중 모르는 내용이 생기면 언제든지 편하게 질문해주세요.</li>
+          <li>가이드 문서를 함께 보며 실습을 진행하니 천천히 따라와주세요.</li>
+          <li>교육 일정은 상황에 따라 조정될 수 있으며, 변경 시 미리 안내 드릴게요.</li>
+          <li>실습에 필요한 계정 및 접속 정보는 해당 교육일에 안내 드릴게요.</li>
+          <li>매일 교육 후 배운 내용을 슬랙 <code style="background:#c7d2fe;color:#312e81;padding:1px 5px;border-radius:4px;font-size:10.5px">#cx_교육</code> 채널에 꼭 기재해주세요.</li>
+        </ul></div>
+      </section>
+    </div>
+    <div class="pane" id="pane-sc">
+      <section>
+        <div class="sec-h"><div class="sec-ico">📅</div><div><div class="sec-t">주간 교육 시간표</div><div class="sec-s">09:00 – 18:00 · 13.1 회의실</div></div></div>
+        <div style="overflow-x:auto"><div id="calWrap"></div></div>
+      </section>
+    </div>
+    <div class="pane" id="pane-cl">
+      <section>
+        <div class="sec-h"><div class="sec-ico">✅</div><div><div class="sec-t">일별 세부 일정</div><div class="sec-s">항목 클릭으로 완료 체크 · 다시 클릭하면 취소 · 시트에 실시간 저장됩니다</div></div></div>
+        <div id="dayCards"></div>
+      </section>
+    </div>
+    <div class="pane" id="pane-lb">
+      <section>
+        <div class="sec-h"><div class="sec-ico">📂</div><div><div class="sec-t">온보딩 자료실</div><div class="sec-s">Google Sheets 자료실 시트에서 링크를 추가하세요</div></div></div>
+        <div id="libWrap"></div>
+      </section>
+    </div>
+  </div>
+</div>
+</div>
+<script>
+// ★★★ 여기에 Apps Script 웹 앱 URL을 붙여넣으세요 ★★★
+var SHEET_API_URL = "여기에_URL_붙여넣기";
 
-function doGet(e) {
-  var action   = e.parameter.action   || "all";
-  var callback = e.parameter.callback || "";
-  var name     = e.parameter.name     || "unknown";
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var result = {};
+// URL에서 입사자 이름 읽기 (?name=홍길동)
+var URL_NAME = (function(){
+  var p = new URLSearchParams(window.location.search);
+  return p.get('name') || '';
+})();
 
-  if (action === "setCheck") {
-    setCheck(ss, name, e.parameter.taskId, e.parameter.checked === "true");
-    result = { ok: true };
-  } else if (action === "checks") {
-    result = { checks: getChecks(ss, name) };
-  } else {
-    if (action === "all" || action === "config")  result.config  = getConfig(ss);
-    if (action === "all" || action === "tasks")   result.tasks   = getTasks(ss);
-    if (action === "all" || action === "checks")  result.checks  = getChecks(ss, name);
-    if (action === "all" || action === "library") result.library = getLibrary(ss);
-  }
+var FALLBACK={config:{"입사자명":"새로운 팀원","교육기간":"2026/06/01 – 06/08 (총 5일)","교육시간":"09:00 – 18:00","교육장소":"13.1 회의실","담당자":"김슬기 · 지주영 · 유영지","회사명_약칭":"아이샵케어","회사명_정식":"주식회사 아이샵케어","회사소개":"소상공인·자영업자를 위한 결제 솔루션 전문기업입니다. VAN·PG 결제부터 토스포스 기반의 POS 시스템까지 통합 제공해요."},tasks:[{일차:"1일차",날짜:"2026-06-01",순서:1,구분:"task",시간:"09:30–11:30",내용:"People팀 온보딩",태그:"",링크:""},{일차:"1일차",날짜:"2026-06-01",순서:2,구분:"break",시간:"11:30–12:30",내용:"점심 🍚",태그:"",링크:""},{일차:"1일차",날짜:"2026-06-01",순서:3,구분:"break",시간:"12:30–13:00",내용:"식후 정비",태그:"",링크:""},{일차:"1일차",날짜:"2026-06-01",순서:4,구분:"task",시간:"13:00–13:30",내용:"CX팀 소개 / 블루체크",태그:"CX팀 소개,블루체크",링크:""},{일차:"1일차",날짜:"2026-06-01",순서:5,구분:"task",시간:"13:30–14:00",내용:"프로필 수정 / 구글 캘린더 연동 / 슬랙 채널 조인",태그:"프로필,캘린더,슬랙",링크:""},{일차:"1일차",날짜:"2026-06-01",순서:6,구분:"task",시간:"14:00–14:30",내용:"스케줄링 방식 / 시프티 사용법",태그:"스케줄링,시프티",링크:""},{일차:"1일차",날짜:"2026-06-01",순서:7,구분:"break",시간:"14:30–14:40",내용:"휴식",태그:"",링크:""},{일차:"1일차",날짜:"2026-06-01",순서:8,구분:"task",시간:"14:40–15:10",내용:"IShopCARE 전체 팀 소개 / 전체 프로세스 이해",태그:"IShopCARE",링크:""},{일차:"1일차",날짜:"2026-06-01",순서:9,구분:"task",시간:"15:10–15:50",내용:"신규 입사자 계정 설정",태그:"계정 설정",링크:""},{일차:"1일차",날짜:"2026-06-01",순서:10,구분:"break",시간:"15:50–16:00",내용:"휴식",태그:"",링크:""},{일차:"1일차",날짜:"2026-06-01",순서:11,구분:"task",시간:"16:00–16:45",내용:"VAN 이해 / 신용카드 결제 장비 / 터미널",태그:"VAN,결제장비,터미널",링크:""},{일차:"1일차",날짜:"2026-06-01",순서:12,구분:"task",시간:"16:45–17:30",내용:"신규 구매 상담 프로세스 이해",태그:"구매상담",링크:""},{일차:"1일차",날짜:"2026-06-01",순서:13,구분:"task",시간:"17:30–18:00",내용:"자사몰 · 스마트스토어 둘러보기",태그:"자사몰,스마트스토어",링크:""},{일차:"1일차",날짜:"2026-06-01",순서:14,구분:"slack",시간:"18:00–18:30",내용:"",태그:"",링크:""},{일차:"2일차",날짜:"2026-06-02",순서:1,구분:"task",시간:"09:00–10:30",내용:"이벤트 Marketing팀 / Business Planning팀 소개",태그:"Marketing팀,BP팀",링크:""},{일차:"2일차",날짜:"2026-06-02",순서:2,구분:"break",시간:"10:30–10:40",내용:"휴식",태그:"",링크:""},{일차:"2일차",날짜:"2026-06-02",순서:3,구분:"task",시간:"10:40–11:30",내용:"판매유형 이해",태그:"판매유형",링크:""},{일차:"2일차",날짜:"2026-06-02",순서:4,구분:"break",시간:"11:30–12:30",내용:"점심 🍚",태그:"",링크:""},{일차:"2일차",날짜:"2026-06-02",순서:5,구분:"break",시간:"12:30–13:00",내용:"식후 개인정비",태그:"",링크:""},{일차:"2일차",날짜:"2026-06-02",순서:6,구분:"task",시간:"13:00–13:40",내용:"인터넷 / 배달",태그:"인터넷,배달",링크:""},{일차:"2일차",날짜:"2026-06-02",순서:7,구분:"task",시간:"13:40–14:40",내용:"출고 과정 / 배송현황 확인",태그:"출고,배송",링크:""},{일차:"2일차",날짜:"2026-06-02",순서:8,구분:"task",시간:"14:40–15:30",내용:"서류 제출 → 청약 (아이파트너스 전체)",태그:"서류,청약",링크:""},{일차:"2일차",날짜:"2026-06-02",순서:9,구분:"break",시간:"15:30–15:40",내용:"휴식",태그:"",링크:""},{일차:"2일차",날짜:"2026-06-02",순서:10,구분:"task",시간:"15:40–16:40",내용:"반품 · 교환 · 출하지시서 이해",태그:"반품,교환",링크:""},{일차:"2일차",날짜:"2026-06-02",순서:11,구분:"task",시간:"16:40–17:10",내용:"퀵 발송",태그:"퀵발송",링크:""},{일차:"2일차",날짜:"2026-06-02",순서:12,구분:"task",시간:"17:10–18:00",내용:"기기 추가",태그:"기기추가",링크:""},{일차:"2일차",날짜:"2026-06-02",순서:13,구분:"slack",시간:"18:00–",내용:"",태그:"",링크:""},{일차:"3일차",날짜:"2026-06-04",순서:1,구분:"task",시간:"09:00–09:50",내용:"채널톡 상담 기준 / 채팅 템플릿 이해",태그:"채널톡,템플릿",링크:""},{일차:"3일차",날짜:"2026-06-04",순서:2,구분:"break",시간:"09:50–10:00",내용:"휴식",태그:"",링크:""},{일차:"3일차",날짜:"2026-06-04",순서:3,구분:"task",시간:"10:00–10:30",내용:"채팅 상담태그 분류 이해",태그:"상담태그",링크:""},{일차:"3일차",날짜:"2026-06-04",순서:4,구분:"task",시간:"10:30–11:30",내용:"상담태그 · 매크로 익히기 · 셀프 스터디",태그:"셀프스터디",링크:""},{일차:"3일차",날짜:"2026-06-04",순서:5,구분:"break",시간:"11:30–12:30",내용:"점심 🍚",태그:"",링크:""},{일차:"3일차",날짜:"2026-06-04",순서:6,구분:"break",시간:"12:30–13:00",내용:"식후 개인정비",태그:"",링크:""},{일차:"3일차",날짜:"2026-06-04",순서:7,구분:"task",시간:"13:00–13:30",내용:"Q&A 및 문제풀이",태그:"",링크:""},{일차:"3일차",날짜:"2026-06-04",순서:8,구분:"task",시간:"13:30–14:30",내용:"IS팀 동석",태그:"IS팀",링크:""},{일차:"3일차",날짜:"2026-06-04",순서:9,구분:"task",시간:"14:30–15:30",내용:"토스포스 기능 (다운로드, 기능 전반)",태그:"토스포스",링크:""},{일차:"3일차",날짜:"2026-06-04",순서:10,구분:"break",시간:"15:30–15:40",내용:"휴식",태그:"",링크:""},{일차:"3일차",날짜:"2026-06-04",순서:11,구분:"task",시간:"15:40–16:20",내용:"선불형 — 업종별 주요기능 / 상품등록 / 전자영수증",태그:"선불형",링크:""},{일차:"3일차",날짜:"2026-06-04",순서:12,구분:"task",시간:"16:20–17:00",내용:"선불형 — 토스오더 픽업 / 프론트 배경 / 키오스크 / 선불권",태그:"토스오더,키오스크",링크:""},{일차:"3일차",날짜:"2026-06-04",순서:13,구분:"break",시간:"17:00–17:10",내용:"휴식",태그:"",링크:""},{일차:"3일차",날짜:"2026-06-04",순서:14,구분:"slack",시간:"17:10–18:00",내용:"",태그:"",링크:""},{일차:"4일차",날짜:"2026-06-05",순서:1,구분:"task",시간:"09:00–09:30",내용:"토스포스 기능 및 연결하기 복습",태그:"",링크:""},{일차:"4일차",날짜:"2026-06-05",순서:2,구분:"task",시간:"09:30–10:30",내용:"선불형 복습",태그:"",링크:""},{일차:"4일차",날짜:"2026-06-05",순서:3,구분:"break",시간:"10:30–10:40",내용:"휴식",태그:"",링크:""},{일차:"4일차",날짜:"2026-06-05",순서:4,구분:"task",시간:"10:40–11:10",내용:"Q&A 및 문제 풀이",태그:"",링크:""},{일차:"4일차",날짜:"2026-06-05",순서:5,구분:"task",시간:"11:10–11:30",내용:"셀프 정리",태그:"",링크:""},{일차:"4일차",날짜:"2026-06-05",순서:6,구분:"break",시간:"11:30–12:30",내용:"점심 🍚",태그:"",링크:""},{일차:"4일차",날짜:"2026-06-05",순서:7,구분:"break",시간:"12:30–13:00",내용:"식후 개인정비",태그:"",링크:""},{일차:"4일차",날짜:"2026-06-05",순서:8,구분:"task",시간:"13:00–14:30",내용:"후불형 — 테이블셋팅 / 배달앱 / 토스오더 테이블 / 포인트·스탬프 / 쿠폰·예약",태그:"후불형,테이블셋팅",링크:""},{일차:"4일차",날짜:"2026-06-05",순서:9,구분:"break",시간:"14:30–14:40",내용:"휴식",태그:"",링크:""},{일차:"4일차",날짜:"2026-06-05",순서:10,구분:"task",시간:"14:40–16:00",내용:"조합별 연결 — 토스포스+프론트 / +유선프린터 / +터미널 / +무선프린터",태그:"조합별연결",링크:""},{일차:"4일차",날짜:"2026-06-05",순서:11,구분:"break",시간:"16:00–16:10",내용:"휴식",태그:"",링크:""},{일차:"4일차",날짜:"2026-06-05",순서:12,구분:"task",시간:"16:10–17:00",내용:"조합별 연결 셀프 진행 + Q&A",태그:"",링크:""},{일차:"4일차",날짜:"2026-06-05",순서:13,구분:"slack",시간:"17:10–18:00",내용:"",태그:"",링크:""},{일차:"5일차",날짜:"2026-06-08",순서:1,구분:"task",시간:"09:00–09:30",내용:"자대리점 · 협력대리점 이해",태그:"자대리점",링크:""},{일차:"5일차",날짜:"2026-06-08",순서:2,구분:"task",시간:"09:30–10:00",내용:"OFF PG 이해 (일반 · 다중)",태그:"OFF PG",링크:""},{일차:"5일차",날짜:"2026-06-08",순서:3,구분:"break",시간:"10:00–10:10",내용:"휴식",태그:"",링크:""},{일차:"5일차",날짜:"2026-06-08",순서:4,구분:"task",시간:"10:10–11:00",내용:"CMS ONE · CMS 계약조건 / 위약금 계산 · 계약서",태그:"CMS,위약금",링크:""},{일차:"5일차",날짜:"2026-06-08",순서:5,구분:"break",시간:"11:00–11:10",내용:"휴식",태그:"",링크:""},{일차:"5일차",날짜:"2026-06-08",순서:6,구분:"task",시간:"11:10–11:30",내용:"셀프 정리 + Q&A",태그:"",링크:""},{일차:"5일차",날짜:"2026-06-08",순서:7,구분:"break",시간:"11:30–12:30",내용:"점심 🍚",태그:"",링크:""},{일차:"5일차",날짜:"2026-06-08",순서:8,구분:"break",시간:"12:30–13:00",내용:"식후 개인정비",태그:"",링크:""},{일차:"5일차",날짜:"2026-06-08",순서:9,구분:"task",시간:"13:00–13:30",내용:"복수가맹 · 문화비 이해",태그:"복수가맹",링크:""},{일차:"5일차",날짜:"2026-06-08",순서:10,구분:"task",시간:"13:30–14:00",내용:"휴대용 단말기 (블루투스형 · 개통형)",태그:"휴대용단말기",링크:""},{일차:"5일차",날짜:"2026-06-08",순서:11,구분:"task",시간:"14:00–14:30",내용:"VAN 관련 용어 소개",태그:"VAN용어",링크:""},{일차:"5일차",날짜:"2026-06-08",순서:12,구분:"break",시간:"14:30–14:40",내용:"휴식",태그:"",링크:""},{일차:"5일차",날짜:"2026-06-08",순서:13,구분:"task",시간:"14:40–17:00",내용:"VAN 한판 정리",태그:"VAN정리",링크:""},{일차:"5일차",날짜:"2026-06-08",순서:14,구분:"slack",시간:"17:00–18:00",내용:"",태그:"",링크:""}],checks:{},library:[]};
 
-  var json   = JSON.stringify(result);
-  var output = callback ? callback + "(" + json + ")" : json;
-  return ContentService
-    .createTextOutput(output)
-    .setMimeType(callback
-      ? ContentService.MimeType.JAVASCRIPT
-      : ContentService.MimeType.JSON);
+var appData={config:{},tasks:[],checks:{},library:[]};
+var isSheetConnected=false;
+
+function loading(on){document.getElementById('lbar').classList.toggle('on',on);}
+function setSyncDot(s){var d=document.getElementById('syncDot');d.className='sync-dot'+(s==='syncing'?' syncing':s==='synced'?' synced':'');}
+function toast(msg,type){var w=document.getElementById('toastWrap');var el=document.createElement('div');el.className='toast'+(type?' '+type:'');el.textContent=(type==='ok'?'✅ ':type==='err'?'❌ ':'')+msg;w.appendChild(el);setTimeout(function(){el.remove();},3000);}
+function fmtDate(raw){
+  if(!raw) return '';
+  // ISO 형식 "2026-05-31T15:00:00.000Z" 처리
+  var s=String(raw);
+  if(s.indexOf('T')>0) s=s.split('T')[0];
+  // "2026-06-01" → "06/01"
+  var parts=s.split('-');
+  if(parts.length>=3) return parts[1]+'/'+parts[2];
+  return s;
+}
+function makeTaskId(t,i){return(t['일차']||'')+'_'+(t['순서']||i);}
+
+// ── JSONP fetch (CORS 우회)
+function jsonp(url,cbPrefix,onSuccess,onError){
+  var name=cbPrefix+Date.now();
+  var tag='_jstag_'+name;
+  window[name]=function(data){delete window[name];var s=document.getElementById(tag);if(s)s.remove();onSuccess(data);};
+  var s=document.createElement('script');s.id=tag;
+  s.onerror=function(){delete window[name];var x=document.getElementById(tag);if(x)x.remove();if(onError)onError();};
+  s.src=url+(url.indexOf('?')>=0?'&':'?')+'callback='+name;
+  document.body.appendChild(s);
 }
 
-// ── 기본정보: 4행부터 데이터
-function getConfig(ss) {
-  var sheet = ss.getSheetByName("기본정보");
-  if (!sheet) return {};
-  var data   = sheet.getDataRange().getValues();
-  var config = {};
-  for (var i = 3; i < data.length; i++) {
-    var key = String(data[i][0] || "").trim();
-    var val = data[i][1];
-    if (key && val !== "" && val !== undefined) config[key] = val;
-  }
-  return config;
+function fetchSheet(){
+  if(!URL_NAME) document.getElementById('nameBanner').style.display='block';
+  if(!SHEET_API_URL||SHEET_API_URL==='여기에_URL_붙여넣기'){useFallback();return;}
+  loading(true);
+  jsonp(SHEET_API_URL+'?action=all&name='+encodeURIComponent(URL_NAME),'_cb',
+    function(data){
+      isSheetConnected=true;
+      appData.config=data.config||FALLBACK.config;
+      appData.tasks=(data.tasks&&data.tasks.length)?data.tasks:FALLBACK.tasks;
+      appData.checks=data.checks||{};
+      appData.library=data.library||[];
+      loading(false);renderAll();setSyncDot('synced');
+    },
+    function(){loading(false);useFallback();}
+  );
 }
 
-// ── 일정: 2행 헤더, 3행부터 데이터
-function getTasks(ss) {
-  var sheet = ss.getSheetByName("일정");
-  if (!sheet) return [];
-  var rows    = sheet.getDataRange().getValues();
-  var headers = rows[1];
-  var tasks   = [];
-  for (var i = 2; i < rows.length; i++) {
-    var row = rows[i];
-    if (!row[0]) continue;
-    var obj = {};
-    headers.forEach(function(h, idx) { obj[String(h).trim()] = row[idx]; });
-    tasks.push(obj);
-  }
-  return tasks;
+function useFallback(){
+  document.getElementById('sheetBanner').style.display='block';
+  appData=JSON.parse(JSON.stringify(FALLBACK));
+  try{var lc=JSON.parse(localStorage.getItem('cx_checks')||'{}');appData.checks=lc;}catch(e){}
+  renderAll();
 }
 
-// ── 완료현황: 이름별로 읽기
-//    시트 구조: A=항목ID, B=이름, C=완료여부, D=처리시각
-function getChecks(ss, name) {
-  var sheet = ss.getSheetByName("완료현황");
-  if (!sheet) return {};
-  var rows   = sheet.getDataRange().getValues();
-  var checks = {};
-  for (var i = 2; i < rows.length; i++) {
-    var taskId   = String(rows[i][0] || "").trim();
-    var rowName  = String(rows[i][1] || "").trim();
-    var checked  = rows[i][2];
-    if (taskId && rowName === name) {
-      checks[taskId] = (checked === true || String(checked).toUpperCase() === "TRUE");
+function pushCheck(taskId,checked){
+  setSyncDot('syncing');
+  if(!SHEET_API_URL||SHEET_API_URL==='여기에_URL_붙여넣기'){
+    try{var lc=JSON.parse(localStorage.getItem('cx_checks')||'{}');lc[taskId]=checked;localStorage.setItem('cx_checks',JSON.stringify(lc));}catch(e){}
+    setSyncDot('synced');return;
+  }
+  jsonp(SHEET_API_URL+'?action=setCheck&taskId='+encodeURIComponent(taskId)+'&checked='+checked+'&name='+encodeURIComponent(URL_NAME),'_cbp',
+    function(r){if(r.ok){setSyncDot('synced');toast('저장되었습니다','ok');}else{setSyncDot('');toast('저장 실패','err');}},
+    function(){setSyncDot('');toast('저장 실패. 네트워크를 확인해주세요','err');}
+  );
+}
+
+function sw(id){
+  document.querySelectorAll('.tab').forEach(function(t,i){t.classList.toggle('on',['ov','sc','cl','lb'][i]===id);});
+  document.querySelectorAll('.pane').forEach(function(p){p.classList.remove('on');});
+  document.getElementById('pane-'+id).classList.add('on');
+}
+
+function updProg(){
+  var tasks=appData.tasks.filter(function(t){return t['구분']==='task';});
+  var tot=tasks.length,done=0;
+  var dayDone={},dayTot={};
+  tasks.forEach(function(t,i){
+    var d=t['일차'];if(!dayTot[d])dayTot[d]=0;if(!dayDone[d])dayDone[d]=0;
+    dayTot[d]++;if(appData.checks[makeTaskId(t,i)]){done++;dayDone[d]++;}
+  });
+  document.getElementById('pf').style.width=tot?(done/tot*100)+'%':'0%';
+  document.getElementById('ptxt').textContent=done+'/'+tot;
+  document.querySelectorAll('[data-daynav]').forEach(function(btn){
+    var d=btn.dataset.daynav;var isDone=dayTot[d]&&dayDone[d]===dayTot[d];
+    btn.className='sb-nav'+(isDone?' done':'');
+    var badge=document.getElementById('bd-'+d);
+    if(badge){badge.textContent=(dayDone[d]||0)+'/'+(dayTot[d]||0);badge.className='dbadge'+(isDone?' done':'');}
+  });
+}
+
+function buildNav(){
+  var nav=document.getElementById('sbNav');nav.innerHTML='';
+  var days=[...new Set(appData.tasks.map(function(t){return t['일차'];}))];
+  days.forEach(function(d){
+    var btn=document.createElement('button');btn.className='sb-nav';btn.dataset.daynav=d;
+    var t=appData.tasks.find(function(x){return x['일차']===d;});
+    var ds=t?fmtDate(t['날짜']||''):'';
+    btn.innerHTML='<span class="sb-dot"></span>'+d+' <span style="opacity:.58;font-size:11px">'+(ds?'('+ds+')':'')+'</span>';
+    btn.onclick=function(){sw('cl');setTimeout(function(){var el=document.getElementById('day-'+d.replace(/\s/g,''));if(el)el.scrollIntoView({behavior:'smooth',block:'start'});},50);};
+    nav.appendChild(btn);
+  });
+}
+
+function renderConfig(){
+  var c=appData.config;
+  var set=function(id,key,fb){var el=document.getElementById(id);if(el)el.textContent=c[key]||fb||'';};
+  var nameEl=document.getElementById('sb-name');
+  if(nameEl) nameEl.textContent=URL_NAME||c['입사자명']||'새로운 팀원';
+  //set('sb-name','입사자명','새로운 팀원');set('sb-cos','회사명_약칭','아이샵케어');
+  set('sb-cof','회사명_정식','주식회사 아이샵케어');set('sb-cod','회사소개','');
+  set('m-period','교육기간','–');set('m-time','교육시간','–');
+  set('m-place','교육장소','–');set('m-trainers','담당자','–');var traineeEl=document.getElementById('m-trainee');
+  if(traineeEl) traineeEl.textContent=URL_NAME||c['입사자명']||'미입력';
+  //set('m-trainee','입사자명','미입력');
+}
+
+function buildCalendar(){
+  var slots=['09:00','09:30','10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00','18:30'];
+  var days=[...new Set(appData.tasks.map(function(t){return t['일차'];}))];
+  var blocks=[
+    {col:1,rs:0,re:3,l:'People팀 온보딩',cls:'gy'},{col:1,rs:4,re:5,l:'점심',cls:'gy'},{col:1,rs:6,re:6,l:'정비',cls:'gy'},
+    {col:1,rs:7,re:7,l:'CX팀 소개',cls:'br'},{col:1,rs:8,re:8,l:'프로필·캘린더·슬랙',cls:'br'},{col:1,rs:9,re:9,l:'스케줄링·시프티',cls:'br'},
+    {col:1,rs:10,re:10,l:'휴식',cls:'gy'},{col:1,rs:11,re:11,l:'IShopCARE',cls:'br'},{col:1,rs:12,re:13,l:'계정 설정',cls:'br'},
+    {col:1,rs:14,re:14,l:'휴식',cls:'gy'},{col:1,rs:15,re:15,l:'VAN·결제',cls:'br'},{col:1,rs:16,re:16,l:'구매상담',cls:'br'},{col:1,rs:17,re:17,l:'자사몰',cls:'br'},
+    {col:2,rs:0,re:2,l:'이벤트팀 소개',cls:'br'},{col:2,rs:3,re:3,l:'휴식',cls:'gy'},{col:2,rs:4,re:5,l:'판매유형',cls:'br'},
+    {col:2,rs:6,re:7,l:'점심',cls:'gy'},{col:2,rs:8,re:8,l:'정비',cls:'gy'},{col:2,rs:9,re:10,l:'인터넷·배달',cls:'br'},
+    {col:2,rs:11,re:13,l:'출고·배송',cls:'br'},{col:2,rs:14,re:16,l:'서류·청약',cls:'br'},{col:2,rs:17,re:18,l:'반품·교환',cls:'br'},
+    {col:3,rs:0,re:1,l:'채널톡 상담',cls:'br'},{col:3,rs:2,re:2,l:'상담태그',cls:'br'},{col:3,rs:3,re:4,l:'매크로 스터디',cls:'ok'},
+    {col:3,rs:5,re:6,l:'점심',cls:'gy'},{col:3,rs:7,re:7,l:'정비',cls:'gy'},{col:3,rs:8,re:8,l:'Q&A',cls:'ok'},
+    {col:3,rs:9,re:10,l:'IS팀 동석',cls:'wn'},{col:3,rs:11,re:13,l:'토스포스 기능',cls:'br'},{col:3,rs:14,re:15,l:'선불형',cls:'br'},{col:3,rs:16,re:17,l:'토스오더·키오스크',cls:'br'},
+    {col:4,rs:0,re:0,l:'토스포스 복습',cls:'ok'},{col:4,rs:1,re:2,l:'선불형 복습',cls:'ok'},{col:4,rs:3,re:3,l:'휴식',cls:'gy'},
+    {col:4,rs:4,re:4,l:'Q&A',cls:'ok'},{col:4,rs:5,re:6,l:'점심',cls:'gy'},{col:4,rs:7,re:7,l:'정비',cls:'gy'},
+    {col:4,rs:8,re:11,l:'후불형 기능',cls:'br'},{col:4,rs:12,re:15,l:'조합별 연결',cls:'br'},{col:4,rs:16,re:17,l:'셀프+Q&A',cls:'ok'},
+    {col:5,rs:0,re:0,l:'자대리점',cls:'br'},{col:5,rs:1,re:1,l:'OFF PG',cls:'br'},{col:5,rs:2,re:2,l:'휴식',cls:'gy'},
+    {col:5,rs:3,re:4,l:'CMS·위약금',cls:'br'},{col:5,rs:5,re:6,l:'점심',cls:'gy'},{col:5,rs:7,re:7,l:'정비',cls:'gy'},
+    {col:5,rs:8,re:8,l:'복수가맹·문화비',cls:'br'},{col:5,rs:9,re:9,l:'휴대용 단말기',cls:'br'},{col:5,rs:10,re:10,l:'VAN 용어',cls:'br'},
+    {col:5,rs:11,re:11,l:'휴식',cls:'gy'},{col:5,rs:12,re:18,l:'VAN 한판 정리',cls:'br'},
+  ];
+  var rows=slots.length-1;
+  var grid=document.createElement('div');grid.className='cal';
+  var hd='<div class="ch">시간</div>';
+  days.forEach(function(d){var t=appData.tasks.find(function(x){return x['일차']===d;});var rawDt=t?(t['날짜']||''):'';var dt=rawDt?fmtDate(rawDt):'';hd+='<div class="chd">'+dt+'<br><span style="font-size:9px;opacity:.8">'+d+'</span></div>';});
+  grid.innerHTML=hd;
+  for(var ri=0;ri<rows;ri++){
+    var tEl=document.createElement('div');tEl.className='ct';tEl.textContent=slots[ri];grid.appendChild(tEl);
+    for(var col=1;col<=5;col++){
+      var blk=blocks.find(function(b){return b.col===col&&b.rs===ri;});
+      var cov=blocks.find(function(b){return b.col===col&&b.rs<ri&&b.re>=ri;});
+      if(blk){var sp=blk.re-blk.rs+1;var c=document.createElement('div');c.className='cc';c.style.gridRow='span '+sp;c.innerHTML='<div class="cb '+blk.cls+'">'+blk.l+'</div>';grid.appendChild(c);}
+      else if(!cov){var ec=document.createElement('div');ec.className='cc';grid.appendChild(ec);}
     }
   }
-  return checks;
+  var wrap=document.getElementById('calWrap');wrap.innerHTML='';wrap.appendChild(grid);
 }
 
-// ── 자료실: 2행 헤더, 3행부터 데이터
-function getLibrary(ss) {
-  var sheet = ss.getSheetByName("자료실");
-  if (!sheet) return [];
-  var rows    = sheet.getDataRange().getValues();
-  var headers = rows[1];
-  var libs    = [];
-  for (var i = 2; i < rows.length; i++) {
-    var row = rows[i];
-    if (!row[0]) continue;
-    var obj = {};
-    headers.forEach(function(h, idx) { obj[String(h).trim()] = row[idx]; });
-    libs.push(obj);
-  }
-  return libs;
+function buildCards(){
+  var con=document.getElementById('dayCards');con.innerHTML='';
+  var days=[...new Set(appData.tasks.map(function(t){return t['일차'];}))];
+  days.forEach(function(day){
+    var dt=appData.tasks.filter(function(t){return t['일차']===day;});
+    var rt=dt.filter(function(t){return t['구분']==='task';});
+    var tot=rt.length;
+    var done=rt.filter(function(t){return appData.checks[makeTaskId(t,appData.tasks.indexOf(t))];}).length;
+    var isDone=tot&&done===tot;
+    var date=dt[0]?fmtDate(dt[0]['날짜']||''):'';
+    var trainer=dt[0]?(dt[0]['담당자']||''):'';
+    var dayId='day-'+day.replace(/\s/g,'');
+    var card=document.createElement('div');card.className='day-card';card.id=dayId;
+    card.innerHTML='<div class="dch" onclick="togDay(\''+dayId+'\')"><div class="dchl"><div class="dnum">'+day.replace('일차','')+'</div><div><div class="dtit">'+date+' · '+day+'</div>'+(trainer?'<div class="dsub"><span class="tr-pill">👤 '+trainer+'</span></div>':'')+'</div></div><div style="display:flex;align-items:center;gap:8px;flex-shrink:0"><span class="dbadge'+(isDone?' done':'')+'" id="bd-'+day+'">'+done+'/'+tot+'</span><span class="dtog">▾</span></div></div><div class="dcb" id="dcb-'+dayId+'"></div>';
+    con.appendChild(card);
+    var body=document.getElementById('dcb-'+dayId);
+    dt.forEach(function(t){
+      var gIdx=appData.tasks.indexOf(t);var cat=t['구분'];
+      if(cat==='break'){var el=document.createElement('div');el.className='t-break';el.innerHTML='<span>'+t['시간']+'</span><span style="color:var(--bor)">·</span><span>'+t['내용']+'</span>';body.appendChild(el);return;}
+      if(cat==='slack'){var sl=document.createElement('div');sl.className='slack-row';sl.innerHTML='💬 '+t['시간']+' — 배운 내용을 <span class="sl-ch">#cx_교육</span>&nbsp;채널에 기재하기';body.appendChild(sl);return;}
+      var taskId=makeTaskId(t,gIdx);var isChk=!!appData.checks[taskId];
+      var tags=(t['태그']||'').split(',').map(function(s){return s.trim();}).filter(Boolean);
+      var link=t['링크']||'';
+      var item=document.createElement('div');item.className='ti'+(isChk?' ck':'');item.dataset.taskid=taskId;
+      item.innerHTML='<div class="tcb"></div><div class="tb"><div class="tt">'+t['시간']+'</div><div class="tl">'+t['내용']+'</div>'+(tags.length?'<div class="ttags">'+tags.map(function(g){return'<span class="ttag">'+g+'</span>';}).join('')+'</div>':'')+(link?'<a class="tlink" href="'+link+'" target="_blank" onclick="event.stopPropagation()">📎 자료 보기</a>':'')+'</div>';
+      item.onclick=function(){var nw=!appData.checks[taskId];appData.checks[taskId]=nw;item.classList.toggle('ck',nw);pushCheck(taskId,nw);updProg();};
+      body.appendChild(item);
+    });
+  });
 }
 
-// ── 완료현황 저장: 이름 + 항목ID 기준으로 저장
-function setCheck(ss, name, taskId, checked) {
-  var sheet = ss.getSheetByName("완료현황");
-  if (!sheet) return;
-  var rows = sheet.getDataRange().getValues();
+function togDay(id){document.getElementById(id).classList.toggle('col');}
 
-  // 같은 이름 + 같은 항목ID 찾기
-  for (var i = 2; i < rows.length; i++) {
-    var existId   = String(rows[i][0] || "").trim();
-    var existName = String(rows[i][1] || "").trim();
-    if (existId === taskId && existName === name) {
-      sheet.getRange(i + 1, 3).setValue(checked);
-      sheet.getRange(i + 1, 4).setValue(new Date().toLocaleString("ko-KR"));
-      return;
-    }
-  }
-  // 없으면 새 행 추가
-  sheet.appendRow([taskId, name, checked, new Date().toLocaleString("ko-KR")]);
+function buildLib(){
+  var wrap=document.getElementById('libWrap');wrap.innerHTML='';
+  var libs=appData.library;
+  if(!libs||!libs.length){wrap.innerHTML='<div class="empty"><div class="empty-ico">📂</div><div class="empty-t">아직 자료가 없어요</div><div class="empty-s">Google Sheets 자료실 시트에 자료명과 링크를 추가하면 여기에 표시됩니다.</div></div>';return;}
+  var days=[...new Set(libs.map(function(l){return l['일차'];}))];
+  days.forEach(function(day){
+    var dl=libs.filter(function(l){return l['일차']===day;});
+    var sec=document.createElement('div');sec.className='lib-sec';sec.innerHTML='<div class="lib-lbl">📅 '+day+'</div>';
+    var grid=document.createElement('div');grid.className='lib-grid';
+    dl.forEach(function(l){
+      var ico={'가이드':'📄','영상':'🎬','시트':'📊','링크':'🔗','기타':'📎'}[l['구분']||l['유형']]||'📄';
+      var url=l['링크']||l['링크 (URL)']||l['URL']||'';
+      var card=document.createElement(url?'a':'div');card.className='lib-card';url=url&&url.indexOf('←')<0?url:'';if(url){card.href=url;card.target='_blank';}
+      card.innerHTML='<div class="lib-ico">'+ico+'</div><div><div class="lib-nm">'+(l['자료명']||'')+'</div><div class="lib-tp">'+(l['구분']||l['유형']||'가이드')+'</div></div>';
+      grid.appendChild(card);
+    });
+    sec.appendChild(grid);wrap.appendChild(sec);
+  });
 }
+
+function renderAll(){renderConfig();buildNav();buildCalendar();buildCards();buildLib();updProg();}
+
+fetchSheet();
+
+if(SHEET_API_URL&&SHEET_API_URL!=='여기에_URL_붙여넣기'){
+  setInterval(function(){
+    jsonp(SHEET_API_URL+'?action=checks&name='+encodeURIComponent(URL_NAME),'_cbr',function(data){
+      if(data.checks){
+        appData.checks=data.checks;
+        document.querySelectorAll('[data-taskid]').forEach(function(el){el.classList.toggle('ck',!!appData.checks[el.dataset.taskid]);});
+        updProg();
+      }
+    },null);
+  },30000);
+}
+</script>
+</body>
+</html>
