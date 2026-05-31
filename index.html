@@ -233,7 +233,7 @@ section{margin-bottom:28px}
     </div>
     <div class="pane" id="pane-sc">
       <section>
-        <div class="sec-h"><div class="sec-ico">📅</div><div><div class="sec-t">주간 교육 시간표</div><div class="sec-s">09:00 – 18:00 · 13.1 회의실</div></div></div>
+        <div class="sec-h"><div class="sec-ico">📅</div><div><div class="sec-t">주간 교육 시간표</div><div class="sec-s">09:00 – 18:00</div></div></div>
         <div style="overflow-x:auto"><div id="calWrap"></div></div>
       </section>
     </div>
@@ -435,7 +435,7 @@ function buildCards(){
     var done=rt.filter(function(t){return appData.checks[makeTaskId(t,appData.tasks.indexOf(t))];}).length;
     var isDone=tot&&done===tot;
     var date=dt[0]?fmtDate(dt[0]['날짜']||''):'';
-    var trainer=dt[0]?(dt[0]['담당자']||''):'';
+    var trainerSet={};dt.forEach(function(t){var tr=t['담당자']||'';if(tr)trainerSet[tr]=true;});var trainer=Object.keys(trainerSet).join(' · ');
     var dayId='day-'+day.replace(/\s/g,'');
     var card=document.createElement('div');card.className='day-card';card.id=dayId;
     card.innerHTML='<div class="dch" onclick="togDay(\''+dayId+'\')"><div class="dchl"><div class="dnum">'+day.replace('일차','')+'</div><div><div class="dtit">'+date+' · '+day+'</div>'+(trainer?'<div class="dsub"><span class="tr-pill">👤 '+trainer+'</span></div>':'')+'</div></div><div style="display:flex;align-items:center;gap:8px;flex-shrink:0"><span class="dbadge'+(isDone?' done':'')+'" id="bd-'+day+'">'+done+'/'+tot+'</span><span class="dtog">▾</span></div></div><div class="dcb" id="dcb-'+dayId+'"></div>';
@@ -487,12 +487,4 @@ if(SHEET_API_URL){
     jsonp(SHEET_API_URL+'?action=checks&name='+encodeURIComponent(URL_NAME),'_cbr',function(data){
       if(data.checks){
         appData.checks=data.checks;
-        document.querySelectorAll('[data-taskid]').forEach(function(el){el.classList.toggle('ck',!!appData.checks[el.dataset.taskid]);});
-        updProg();
-      }
-    },null);
-  },30000);
-}
-</script>
-</body>
-</htm
+        document.querySelectorAll('[data-taskid]').forEach(function(el){el.classList.toggle('ck',!!appData.checks[el.dataset.tas
