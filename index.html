@@ -296,7 +296,7 @@ function jsonp(url,cbPrefix,onSuccess,onError){
   window[name]=function(data){delete window[name];var s=document.getElementById(tag);if(s)s.remove();onSuccess(data);};
   var s=document.createElement('script');s.id=tag;
   s.onerror=function(){delete window[name];var x=document.getElementById(tag);if(x)x.remove();if(onError)onError();};
-  s.src=url+(url.indexOf('?')>=0?'&':'?')+'callback='+name;
+  s.src=url+'callback='+name;
   document.body.appendChild(s);
 }
 
@@ -304,7 +304,7 @@ function fetchSheet(){
   if(!URL_NAME) document.getElementById('nameBanner').style.display='block';
   if(!SHEET_API_URL){useFallback();return;}
   loading(true);
-  jsonp(SHEET_API_URL+'?action=all&name='+encodeURIComponent(URL_NAME),'_cb',
+  jsonp(SHEET_API_URL+'?action=all&name='+encodeURIComponent(URL_NAME)+'&','_cb',
     function(data){
       isSheetConnected=true;
       appData.config=data.config||FALLBACK.config;
@@ -330,7 +330,7 @@ function pushCheck(taskId,checked){
     try{var lc=JSON.parse(localStorage.getItem('cx_checks')||'{}');lc[taskId]=checked;localStorage.setItem('cx_checks',JSON.stringify(lc));}catch(e){}
     setSyncDot('synced');return;
   }
-  jsonp(SHEET_API_URL+'?action=setCheck&taskId='+encodeURIComponent(taskId)+'&checked='+checked+'&name='+encodeURIComponent(URL_NAME),'_cbp',
+  jsonp(SHEET_API_URL+'?action=setCheck&taskId='+encodeURIComponent(taskId)+'&checked='+checked+'&name='+encodeURIComponent(URL_NAME)+'&','_cbp',
     function(r){if(r.ok){setSyncDot('synced');toast('저장되었습니다','ok');}else{setSyncDot('');toast('저장 실패','err');}},
     function(){setSyncDot('');toast('저장 실패. 네트워크를 확인해주세요','err');}
   );
@@ -493,4 +493,4 @@ function buildLib(){
       var url=l['링크']||l['링크 (URL)']||l['URL']||'';
       var card=document.createElement(url?'a':'div');card.className='lib-card';url=url&&url.indexOf('←')<0?url:'';if(url){card.href=url;card.target='_blank';}
       card.innerHTML='<div class="lib-ico">'+ico+'</div><div><div class="lib-nm">'+(l['자료명']||'')+'</div><div class="lib-tp">'+(l['구분']||l['유형']||'가이드')+'</div></div>';
-   
+      grid.appendChild(ca
