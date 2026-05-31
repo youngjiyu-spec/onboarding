@@ -177,7 +177,7 @@ section{margin-bottom:28px}
 </aside>
 <div class="main">
   <div class="topbar">
-    <div class="bc"><span>CX 내부가이드</span><span>›</span><span class="cur">신규 온보딩 커리큘럼</span></div>
+    <div class="bc"><span class="cur">신규 온보딩 커리큘럼</span></div>
     <div style="display:flex;align-items:center;gap:12px">
       <div class="pw">
         <div class="pt"><div class="pf" id="pf"></div></div>
@@ -438,7 +438,7 @@ function buildCards(){
     var trainerSet={};dt.forEach(function(t){var tr=t['담당자']||'';if(tr)trainerSet[tr]=true;});var trainer=Object.keys(trainerSet).join(' · ');
     var dayId='day-'+day.replace(/\s/g,'');
     var card=document.createElement('div');card.className='day-card';card.id=dayId;
-    card.innerHTML='<div class="dch" onclick="togDay(\''+dayId+'\')"><div class="dchl"><div class="dnum">'+day.replace('일차','')+'</div><div><div class="dtit">'+date+' · '+day+'</div>'+(trainer?'<div class="dsub"><span class="tr-pill">👤 '+trainer+'</span></div>':'')+'</div></div><div style="display:flex;align-items:center;gap:8px;flex-shrink:0"><span class="dbadge'+(isDone?' done':'')+'" id="bd-'+day+'">'+done+'/'+tot+'</span><span class="dtog">▾</span></div></div><div class="dcb" id="dcb-'+dayId+'"></div>';
+    card.innerHTML='<div class="dch" onclick="togDay(\"+dayId+\")"><div class="dchl"><div class="dnum">'+day.replace('일차','')+'</div><div><div class="dtit">'+date+' · '+day+'</div>'+(trainer?'<div class="dsub"><span class="tr-pill">👤 '+trainer+'</span></div>':'')+'</div></div><div style="display:flex;align-items:center;gap:8px;flex-shrink:0"><span class="dbadge'+(isDone?' done':'')+'" id="bd-'+day+'">'+done+'/'+tot+'</span><span class="dtog">▾</span></div></div><div class="dcb" id="dcb-'+dayId+'"></div>';
     con.appendChild(card);
     var body=document.getElementById('dcb-'+dayId);
     dt.forEach(function(t){
@@ -493,4 +493,6 @@ function buildLib(){
       var url=l['링크']||l['링크 (URL)']||l['URL']||'';
       var card=document.createElement(url?'a':'div');card.className='lib-card';url=url&&url.indexOf('←')<0?url:'';if(url){card.href=url;card.target='_blank';}
       card.innerHTML='<div class="lib-ico">'+ico+'</div><div><div class="lib-nm">'+(l['자료명']||'')+'</div><div class="lib-tp">'+(l['구분']||l['유형']||'가이드')+'</div></div>';
-      grid.appendChild(ca
+      grid.appendChild(card);
+    });
+    sec.appendChild(grid
