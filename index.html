@@ -262,10 +262,14 @@ function setSyncDot(s){var d=document.getElementById('syncDot');d.className='syn
 function toast(msg,type){var w=document.getElementById('toastWrap');var el=document.createElement('div');el.className='toast'+(type?' '+type:'');el.textContent=(type==='ok'?'✅ ':type==='err'?'❌ ':'')+msg;w.appendChild(el);setTimeout(function(){el.remove();},3000);}
 function fmtDate(raw){
   if(!raw) return '';
-  // ISO 형식 "2026-05-31T15:00:00.000Z" 처리
   var s=String(raw);
-  if(s.indexOf('T')>0) s=s.split('T')[0];
-  // "2026-06-01" → "06/01"
+  if(s.indexOf('T')>0){
+    var d=new Date(s);
+    d.setHours(d.getHours()+9);
+    var mm=String(d.getUTCMonth()+1).padStart(2,'0');
+    var dd=String(d.getUTCDate()).padStart(2,'0');
+    return mm+'/'+dd;
+  }
   var parts=s.split('-');
   if(parts.length>=3) return parts[1]+'/'+parts[2];
   return s;
