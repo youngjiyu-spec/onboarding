@@ -110,7 +110,7 @@ section{margin-bottom:28px}
 .ti.ck .tl{color:var(--t3);text-decoration:line-through}
 .ttags{display:flex;flex-wrap:wrap;gap:3px;margin-top:3px}
 .ttag{font-size:10px;background:var(--brand-l);color:var(--brand);padding:1px 6px;border-radius:99px;font-weight:500}
-.tlink{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--brand);margin-top:4px;text-decoration:none;background:var(--brand-l);padding:2px 8px;border-radius:99px;font-weight:500;transition:.15s}
+.tlinks{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.tlink{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--brand);text-decoration:none;background:var(--brand-l);padding:3px 10px;border-radius:99px;font-weight:500;transition:.15s;border:0.5px solid var(--brand-b)}
 .tlink:hover{background:var(--brand-b)}
 .t-break{display:flex;gap:6px;padding:4px 7px;font-size:11.5px;color:var(--t3)}
 .slack-row{display:flex;align-items:center;gap:7px;margin-top:6px;padding:9px 12px;background:#fff7ed;border:1px solid #fed7aa;border-radius:var(--r);font-size:12px;color:#92400e}
@@ -446,11 +446,32 @@ function buildCards(){
       if(cat==='break'){var el=document.createElement('div');el.className='t-break';el.innerHTML='<span>'+t['시간']+'</span><span style="color:var(--bor)">·</span><span>'+t['내용']+'</span>';body.appendChild(el);return;}
       if(cat==='slack'){var sl=document.createElement('div');sl.className='slack-row';sl.innerHTML='💬 '+t['시간']+' — 배운 내용을 <span class="sl-ch">#cx_교육</span>&nbsp;채널에 기재하기';body.appendChild(sl);return;}
       var taskId=makeTaskId(t,gIdx);var isChk=!!appData.checks[taskId];
-      var tags=(t['태그']||'').split(',').map(function(s){return s.trim();}).filter(Boolean);
-      var link=t['링크']||'';
+      var links=[];
+      var rawLinks=(t['링크']||'').toString().trim();
+      if(rawLinks && rawLinks.indexOf('←')<0){
+        rawLinks.split('|').forEach(function(l){
+          var parts=l.split('::');
+          var url=parts[0].trim();
+          var label=parts[1]?parts[1].trim():'자료 보기';
+          if(url) links.push({url:url,label:label});
+        });
+      }
+      var linkHtml='';
+      if(links.length){
+        linkHtml='<div class="tlinks">'+links.map(function(l){
+          return'<a class="tlink" href="'+l.url+'" target="_blank" onclick="event.stopPropagation()">📎 '+l.label+'</a>';
+        }).join('')+'</div>';
+      }
       var item=document.createElement('div');item.className='ti'+(isChk?' ck':'');item.dataset.taskid=taskId;
-      item.innerHTML='<div class="tcb"></div><div class="tb"><div class="tt">'+t['시간']+'</div><div class="tl">'+t['내용']+'</div>'+(tags.length?'<div class="ttags">'+tags.map(function(g){return'<span class="ttag">'+g+'</span>';}).join('')+'</div>':'')+(link?'<a class="tlink" href="'+link+'" target="_blank" onclick="event.stopPropagation()">📎 자료 보기</a>':'')+'</div>';
-      item.onclick=function(){var nw=!appData.checks[taskId];appData.checks[taskId]=nw;item.classList.toggle('ck',nw);pushCheck(taskId,nw);updProg();};
+      item.innerHTML='<div class="tcb"></div><div class="tb"><div class="tt">'+t['시간']+'</div><div class="tl">'+t['내용']+'</div>'+(isChk?'':linkHtml)+'</div>';
+      item.onclick=function(){
+        var nw=!appData.checks[taskId];
+        appData.checks[taskId]=nw;
+        item.classList.toggle('ck',nw);
+        var linkDiv=item.querySelector('.tlinks');
+        if(linkDiv) linkDiv.style.display=nw?'none':'flex';
+        pushCheck(taskId,nw);updProg();
+      };
       body.appendChild(item);
     });
   });
@@ -472,19 +493,4 @@ function buildLib(){
       var url=l['링크']||l['링크 (URL)']||l['URL']||'';
       var card=document.createElement(url?'a':'div');card.className='lib-card';url=url&&url.indexOf('←')<0?url:'';if(url){card.href=url;card.target='_blank';}
       card.innerHTML='<div class="lib-ico">'+ico+'</div><div><div class="lib-nm">'+(l['자료명']||'')+'</div><div class="lib-tp">'+(l['구분']||l['유형']||'가이드')+'</div></div>';
-      grid.appendChild(card);
-    });
-    sec.appendChild(grid);wrap.appendChild(sec);
-  });
-}
-
-function renderAll(){renderConfig();buildNav();buildCalendar();buildCards();buildLib();updProg();}
-
-fetchSheet();
-
-if(SHEET_API_URL){
-  setInterval(function(){
-    jsonp(SHEET_API_URL+'?action=checks&name='+encodeURIComponent(URL_NAME),'_cbr',function(data){
-      if(data.checks){
-        appData.checks=data.checks;
-        document.querySelectorAll('[data-taskid]').forEach(function(el){el.classList.toggle('ck',!!appData.checks[el.dataset.tas
+   
