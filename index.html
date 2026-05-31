@@ -295,7 +295,7 @@ function jsonp(url,cbPrefix,onSuccess,onError){
 
 function fetchSheet(){
   if(!URL_NAME) document.getElementById('nameBanner').style.display='block';
-  if(!SHEET_API_URL||SHEET_API_URL==='https://script.google.com/macros/s/AKfycbzvcjfF2ZoRKBObf0JR7TjaD4z9SeK-YRZXNO3ngp413TER-XpS9_hXpRMGZxC8clqf/exec'){useFallback();return;}
+  if(!SHEET_API_URL){useFallback();return;}
   loading(true);
   jsonp(SHEET_API_URL+'?action=all&name='+encodeURIComponent(URL_NAME),'_cb',
     function(data){
@@ -319,7 +319,7 @@ function useFallback(){
 
 function pushCheck(taskId,checked){
   setSyncDot('syncing');
-  if(!SHEET_API_URL||SHEET_API_URL==='https://script.google.com/macros/s/AKfycbzvcjfF2ZoRKBObf0JR7TjaD4z9SeK-YRZXNO3ngp413TER-XpS9_hXpRMGZxC8clqf/exec'){
+  if(!SHEET_API_URL){
     try{var lc=JSON.parse(localStorage.getItem('cx_checks')||'{}');lc[taskId]=checked;localStorage.setItem('cx_checks',JSON.stringify(lc));}catch(e){}
     setSyncDot('synced');return;
   }
@@ -475,7 +475,7 @@ function renderAll(){renderConfig();buildNav();buildCalendar();buildCards();buil
 
 fetchSheet();
 
-if(SHEET_API_URL&&SHEET_API_URL!=='https://script.google.com/macros/s/AKfycbzvcjfF2ZoRKBObf0JR7TjaD4z9SeK-YRZXNO3ngp413TER-XpS9_hXpRMGZxC8clqf/exec'){
+if(SHEET_API_URL){
   setInterval(function(){
     jsonp(SHEET_API_URL+'?action=checks&name='+encodeURIComponent(URL_NAME),'_cbr',function(data){
       if(data.checks){
