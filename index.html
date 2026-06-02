@@ -774,7 +774,14 @@ function saveMemoBtn(taskId){
   if(btn){ btn.textContent='메모 ✓'; btn.classList.add('has-memo'); }
   if(view){
     view.classList.remove('open');
-    view.innerHTML='<div class="memo-bubble"><span>📌</span><span class="memo-bubble-text">'+ta.value.trim()+'</span><button class="memo-edit" onclick="editMemoBtn(''+taskId+'')">수정</button></div>';
+    var bubble = document.createElement('div');
+    bubble.className = 'memo-bubble';
+    var pin = document.createElement('span'); pin.textContent='📌';
+    var txt = document.createElement('span'); txt.className='memo-bubble-text'; txt.textContent=ta.value.trim();
+    var eb = document.createElement('button'); eb.className='memo-edit'; eb.textContent='수정';
+    eb.onclick = function(){ editMemoBtn(taskId); };
+    bubble.appendChild(pin); bubble.appendChild(txt); bubble.appendChild(eb);
+    view.innerHTML=''; view.appendChild(bubble);
   }
   var form = document.getElementById('mf-'+taskId);
   if(form) form.classList.remove('open');
@@ -798,8 +805,57 @@ function cancelMemoBtn(taskId){
 
 function makeMemoHtml(taskId){
   var existing = memoData[taskId] ? memoData[taskId].text : '';
-  var hasMemo = !!existing;
-  return '<div class="memo-form" id="mf-'+taskId+'"><textarea class="memo-ta" id="mta-'+taskId+'" oninput="autoResize(this)" placeholder="이 항목에 대한 메모를 자유롭게 남겨보세요...">'+existing+'</textarea><div class="memo-actions"><button class="memo-save" onclick="saveMemoBtn(''+taskId+'')">저장</button><button class="memo-cancel" onclick="cancelMemoBtn(''+taskId+'')">취소</button></div></div><div class="memo-view" id="mv-'+taskId+'"><div class="memo-bubble"><span>📌</span><span class="memo-bubble-text">'+existing+'</span><button class="memo-edit" onclick="editMemoBtn(''+taskId+'')">수정</button></div></div>';
+  var wrap = document.createElement('div');
+
+  // 메모 입력 폼
+  var form = document.createElement('div');
+  form.className = 'memo-form';
+  form.id = 'mf-'+taskId;
+
+  var ta = document.createElement('textarea');
+  ta.className = 'memo-ta';
+  ta.id = 'mta-'+taskId;
+  ta.placeholder = '이 항목에 대한 메모를 자유롭게 남겨보세요...';
+  ta.value = existing;
+  ta.oninput = function(){ autoResize(this); };
+  form.appendChild(ta);
+
+  var actions = document.createElement('div');
+  actions.className = 'memo-actions';
+
+  var saveBtn = document.createElement('button');
+  saveBtn.className = 'memo-save';
+  saveBtn.textContent = '저장';
+  saveBtn.onclick = function(){ saveMemoBtn(taskId); };
+
+  var cancelBtn = document.createElement('button');
+  cancelBtn.className = 'memo-cancel';
+  cancelBtn.textContent = '취소';
+  cancelBtn.onclick = function(){ cancelMemoBtn(taskId); };
+
+  actions.appendChild(saveBtn);
+  actions.appendChild(cancelBtn);
+  form.appendChild(actions);
+
+  // 메모 보기 영역
+  var view = document.createElement('div');
+  view.className = 'memo-view';
+  view.id = 'mv-'+taskId;
+  if(existing){
+    var bubble = document.createElement('div');
+    bubble.className = 'memo-bubble';
+    bubble.innerHTML = '<span>📌</span><span class="memo-bubble-text">'+existing+'</span>';
+    var editBtn = document.createElement('button');
+    editBtn.className = 'memo-edit';
+    editBtn.textContent = '수정';
+    editBtn.onclick = function(){ editMemoBtn(taskId); };
+    bubble.appendChild(editBtn);
+    view.appendChild(bubble);
+  }
+
+  wrap.appendChild(form);
+  wrap.appendChild(view);
+  return wrap.outerHTML;
 }
 
 function togDay(id){
