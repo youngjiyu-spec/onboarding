@@ -111,6 +111,48 @@ section{margin-bottom:28px}
 .tlink:hover{background:var(--brand-b)}
 .t-break{display:flex;gap:6px;padding:4px 7px;font-size:11.5px;color:var(--t3)}
 .slack-row{display:flex;align-items:center;gap:7px;margin-top:6px;padding:9px 12px;background:#fff7ed;border:1px solid #fed7aa;border-radius:var(--r);font-size:12px;color:#92400e}
+.carry-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:8px 14px;margin-top:8px;background:#fef2f2;border:1px solid #fca5a5;border-radius:var(--r);font-size:12px;font-weight:600;color:#b91c1c;cursor:pointer;transition:.15s}
+.carry-btn:hover{background:#fee2e2}
+.carry-btn:disabled{opacity:.6;cursor:default}
+.carry-section{background:#fef2f2;border:1px solid #fca5a5;border-radius:var(--r);padding:12px 14px;margin-bottom:10px}
+.carry-section-title{font-size:11.5px;font-weight:700;color:#b91c1c;margin-bottom:8px;display:flex;align-items:center;gap:5px}
+.carry-item{display:flex;align-items:flex-start;gap:9px;padding:7px 8px;border-radius:6px;cursor:pointer;background:rgba(255,255,255,.7);margin-bottom:4px}
+.carry-item:last-child{margin-bottom:0}
+.carry-item:hover{background:rgba(255,255,255,.9)}
+.carry-cb{width:16px;height:16px;border-radius:4px;border:1.5px solid #fca5a5;flex-shrink:0;margin-top:2px;background:#fef2f2;display:flex;align-items:center;justify-content:center;transition:.15s}
+.carry-done .carry-cb{background:#10b981;border-color:#10b981}
+.carry-done .carry-cb::after{content:'';width:8px;height:5px;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(-45deg) translateY(-1px);display:block}
+.carry-done .carry-label{text-decoration:line-through;color:var(--t3)}
+.carry-done .tlinks{display:none}
+.memo-btn{flex-shrink:0;padding:2px 8px;border-radius:6px;border:0.5px solid var(--bor);background:transparent;cursor:pointer;font-size:10px;font-weight:500;color:var(--t3);margin-top:2px;white-space:nowrap;transition:.15s;font-family:inherit}
+.memo-btn:hover{border-color:var(--brand);color:var(--brand)}
+.memo-btn.has-memo{border-color:#bbf7d0;background:#f0fdf4;color:#166534}
+.memo-form{display:none;padding:4px 0 6px 25px}
+.memo-form.open{display:block}
+.memo-ta{width:100%;border:1px solid var(--bor);border-radius:8px;padding:8px 10px;font-size:12.5px;font-family:inherit;resize:none;outline:none;background:var(--sur2);min-height:56px;overflow:hidden;line-height:1.6;color:var(--t1);transition:.15s}
+.memo-ta:focus{border-color:var(--brand)}
+.memo-actions{display:flex;gap:6px;margin-top:5px}
+.memo-save{padding:4px 12px;background:var(--brand);color:#fff;border:none;border-radius:6px;font-size:11.5px;font-weight:500;cursor:pointer;font-family:inherit}
+.memo-cancel{padding:4px 12px;background:var(--sur2);border:0.5px solid var(--bor);border-radius:6px;font-size:11.5px;cursor:pointer;color:var(--t2);font-family:inherit}
+.memo-view{display:none;padding:4px 0 6px 25px}
+.memo-view.open{display:block}
+.memo-bubble{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:8px 10px;font-size:12.5px;color:#166534;display:flex;align-items:flex-start;gap:6px}
+.memo-bubble-text{flex:1;line-height:1.6;white-space:pre-wrap;word-break:break-word}
+.memo-edit{flex-shrink:0;font-size:10px;color:var(--brand);background:none;border:none;cursor:pointer;padding:0;font-family:inherit}
+.feedback-wrap{margin-top:10px;border-top:1px solid var(--bor);padding-top:10px}
+.feedback-btn{display:flex;align-items:center;gap:6px;padding:8px 14px;background:var(--brand-l);border:1px solid var(--brand-b);border-radius:var(--r);font-size:12.5px;font-weight:600;color:var(--brand);cursor:pointer;transition:.15s;width:100%;justify-content:center}
+.feedback-btn:hover{background:var(--brand-b)}
+.feedback-form{display:none;margin-top:12px;background:var(--sur2);border-radius:var(--r);padding:14px 16px}
+.feedback-form.open{display:block}
+.ff-label{font-size:11px;font-weight:600;color:var(--t2);margin-bottom:4px;margin-top:10px;display:block}
+.ff-label:first-child{margin-top:0}
+.ff-textarea{width:100%;border:1px solid var(--bor);border-radius:var(--r);padding:8px 10px;font-size:13px;font-family:inherit;color:var(--t1);outline:none;resize:vertical;min-height:60px;transition:.15s;background:var(--sur)}
+.ff-textarea:focus{border-color:var(--brand)}
+.ff-submit{margin-top:12px;padding:9px 20px;background:var(--brand);color:#fff;border:none;border-radius:var(--r);font-size:13px;font-weight:600;cursor:pointer;transition:.15s;width:100%}
+.ff-submit:hover{background:var(--brand-h)}
+.ff-submit:disabled{background:var(--t3);cursor:default}
+.ff-done{text-align:center;padding:14px;font-size:13px;color:var(--ok);font-weight:600;display:none}
+.ff-done.show{display:block}
 .sl-ch{font-family:monospace;background:#fed7aa;padding:1px 5px;border-radius:4px;font-size:10.5px}
 .lib-sec{margin-bottom:18px}
 .lib-lbl{font-size:12px;font-weight:700;color:var(--t2);margin-bottom:7px;display:flex;align-items:center;gap:7px}
@@ -251,7 +293,14 @@ section{margin-bottom:28px}
 <script>
 var SHEET_API_URL = "https://script.google.com/macros/s/AKfycbzvcjfF2ZoRKBObf0JR7TjaD4z9SeK-YRZXNO3ngp413TER-XpS9_hXpRMGZxC8clqf/exec";
 var URL_NAME = (function(){ var p = new URLSearchParams(window.location.search); return p.get('name') || ''; })();
-var appData = {config:{}, tasks:[], checks:{}, library:[]};
+var URL_START = (function(){ var p = new URLSearchParams(window.location.search); return p.get('start') || ''; })();
+var appData = {config:{}, tasks:[], checks:{}, library:[], holidays:[]};
+var carryOver = {};
+var memoData = {}; // {taskId: {text, visible}}
+try { memoData = JSON.parse(localStorage.getItem('cx_memo_'+URL_NAME)||'{}'); } catch(e){}
+function saveMemoStore(){ try{ localStorage.setItem('cx_memo_'+URL_NAME, JSON.stringify(memoData)); }catch(e){} } // {다음일차: [미완료 task 목록]}
+try { carryOver = JSON.parse(localStorage.getItem('cx_carry_'+URL_NAME)||'{}'); } catch(e){}
+function saveCarry(){ try{ localStorage.setItem('cx_carry_'+URL_NAME, JSON.stringify(carryOver)); }catch(e){} }
 
 function loading(on){ document.getElementById('lbar').classList.toggle('on', on); }
 function setSyncDot(s){ var d=document.getElementById('syncDot'); d.className='sync-dot'+(s==='syncing'?' syncing':s==='synced'?' synced':''); }
@@ -269,6 +318,26 @@ function fmtDate(raw){
   var parts = s.split('-');
   if(parts.length >= 3) return parts[1]+'/'+parts[2];
   return s;
+}
+function getWorkdays(startStr, count){
+  // 평일 + 공휴일 제외하여 count개 날짜 반환
+  var days = [];
+  if(!startStr) return days;
+  var parts = startStr.split('-');
+  if(parts.length < 3) return days;
+  var d = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
+  var holidays = appData.holidays || [];
+  while(days.length < count){
+    var dow = d.getDay(); // 0=일, 6=토
+    var mm = String(d.getMonth()+1).padStart(2,'0');
+    var dd = String(d.getDate()).padStart(2,'0');
+    var dateStr = d.getFullYear()+'-'+mm+'-'+dd;
+    if(dow !== 0 && dow !== 6 && holidays.indexOf(dateStr) < 0){
+      days.push(dateStr);
+    }
+    d.setDate(d.getDate()+1);
+  }
+  return days;
 }
 function makeTaskId(t, i){ return (t['일차']||'')+'_'+(t['순서']||i); }
 
@@ -310,6 +379,7 @@ function fetchSheet(){
       appData.tasks   = (data.tasks && data.tasks.length) ? data.tasks : [];
       appData.checks  = data.checks  || {};
       appData.library = data.library || [];
+      appData.holidays = data.holidays || [];
       loading(false);
       renderAll();
       setSyncDot('synced');
@@ -331,6 +401,20 @@ function pushCheck(taskId, checked){
     SHEET_API_URL + '?action=setCheck&taskId=' + encodeURIComponent(taskId) + '&checked=' + checked + '&name=' + encodeURIComponent(URL_NAME),
     function(r){ if(r.ok){ setSyncDot('synced'); toast('저장되었습니다','ok'); } else { setSyncDot(''); toast('저장 실패','err'); } },
     function(){ setSyncDot(''); toast('저장 실패','err'); }
+  );
+}
+
+function pushFeedback(day, learned, difficult, suggestion, onDone){
+  if(!SHEET_API_URL){ onDone(false); return; }
+  jsonpFetch(
+    SHEET_API_URL + '?action=saveFeedback' +
+    '&name=' + encodeURIComponent(URL_NAME) +
+    '&day=' + encodeURIComponent(day) +
+    '&learned=' + encodeURIComponent(learned) +
+    '&difficult=' + encodeURIComponent(difficult) +
+    '&suggestion=' + encodeURIComponent(suggestion),
+    function(r){ onDone(r && r.ok); },
+    function(){ onDone(false); }
   );
 }
 
@@ -364,7 +448,9 @@ function buildNav(){
     var btn = document.createElement('button');
     btn.className='sb-nav'; btn.dataset.daynav=d;
     var t = appData.tasks.find(function(x){ return x['일차']===d; });
-    var ds = t ? fmtDate(t['날짜']||'') : '';
+    var navIdx = days.indexOf(d);
+    var workdaysNav = URL_START ? getWorkdays(URL_START, days.length) : [];
+    var ds = workdaysNav.length ? workdaysNav[navIdx].slice(5).replace('-','/') : (t ? fmtDate(t['날짜']||'') : '');
     btn.innerHTML = '<span class="sb-dot"></span>'+d+' <span style="opacity:.58;font-size:11px">'+(ds?'('+ds+')':'')+'</span>';
     btn.onclick = function(){
       sw('cl');
@@ -417,9 +503,12 @@ function buildCalendar(){
   var rows=slots.length-1;
   var grid=document.createElement('div'); grid.className='cal';
   var hd='<div class="ch">시간</div>';
-  days.forEach(function(d){
-    var t=appData.tasks.find(function(x){ return x['일차']===d; });
-    var dt=t?fmtDate(t['날짜']||''):'';
+  var workdays = URL_START ? getWorkdays(URL_START, days.length) : [];
+  days.forEach(function(d, idx){
+    var dt = workdays.length ? workdays[idx].slice(5).replace('-','/') : (function(){
+      var t=appData.tasks.find(function(x){ return x['일차']===d; });
+      return t?fmtDate(t['날짜']||''):'';
+    })();
     hd+='<div class="chd">'+dt+'<br><span style="font-size:9px;opacity:.8">'+d+'</span></div>';
   });
   grid.innerHTML=hd;
@@ -451,7 +540,9 @@ function buildCards(){
     var tot=rt.length;
     var done=rt.filter(function(t){ return appData.checks[makeTaskId(t, appData.tasks.indexOf(t))]; }).length;
     var isDone=tot&&done===tot;
-    var date=dt[0]?fmtDate(dt[0]['날짜']||''):'';
+    var dayIdx=days.indexOf(day);
+    var workdays2 = URL_START ? getWorkdays(URL_START, days.length) : [];
+    var date = workdays2.length ? workdays2[dayIdx].slice(5).replace('-','/') : (dt[0]?fmtDate(dt[0]['날짜']||''):'');
     var trainerSet={};
     dt.forEach(function(t){ var tr=t['담당자']||''; if(tr) trainerSet[tr]=true; });
     var trainer=Object.keys(trainerSet).join(' · ');
@@ -462,6 +553,63 @@ function buildCards(){
     card.querySelector('.dch').addEventListener('click', function(){ togDay(this.dataset.dayid); });
     con.appendChild(card);
     var body=document.getElementById('dcb-'+dayId);
+
+    // 이전 일차 미완료 항목 표시
+    if(carryOver[day] && carryOver[day].length){
+      var cs=document.createElement('div'); cs.className='carry-section';
+      // 일차 이름 추출 (예: "2일차" → "1일차")
+      var prevDayName = days[days.indexOf(day)-1] || '이전 일차';
+      cs.innerHTML='<div class="carry-section-title">⚠️ '+prevDayName+' 미완료 항목</div>';
+      carryOver[day].forEach(function(ct){
+        var taskId=ct.taskId;
+        var isChk=!!appData.checks[taskId];
+        var citem=document.createElement('div');
+        citem.className='carry-item'+(isChk?' carry-done':'');
+        citem.dataset.taskid=taskId;
+
+        // 자료 링크 버튼 생성
+        var linkHtml='';
+        var rawLinks=(ct.links||'').toString().trim();
+        if(rawLinks && rawLinks.indexOf('←')<0 && rawLinks.indexOf('http')>=0 && !isChk){
+          var lparts=rawLinks.split('|');
+          var lbtns=lparts.map(function(l){
+            var p=l.split('::');
+            var u=p[0].trim();
+            var lbl=p[1]?p[1].trim():'자료 보기';
+            return u?'<a class="tlink" href="'+u+'" target="_blank" onclick="event.stopPropagation()">📎 '+lbl+'</a>':'';
+          }).join('');
+          if(lbtns) linkHtml='<div class="tlinks carry-links">'+lbtns+'</div>';
+        }
+
+        var cMemoHas = memoData[taskId] && memoData[taskId].text;
+        citem.innerHTML=
+          '<div class="carry-cb"></div>'+
+          '<div class="tb" style="flex:1">'+
+            '<div class="tt" style="color:#dc2626">미완료</div>'+
+            '<div class="carry-label tl">'+ct.label+'</div>'+
+            linkHtml+
+          '</div>'+
+          '<button class="memo-btn'+(cMemoHas?' has-memo':'')+'" id="mb-'+taskId+'" onclick="event.stopPropagation();clickMemoBtn(''+taskId+'')">'+(cMemoHas?'메모 ✓':'메모')+'</button>';
+
+        citem.addEventListener('click',function(e){
+          if(e.target.classList.contains('tlink')) return;
+          var nw=!appData.checks[taskId];
+          appData.checks[taskId]=nw;
+          citem.classList.toggle('carry-done',nw);
+          var ld=citem.querySelector('.carry-links');
+          if(ld) ld.style.display=nw?'none':'flex';
+          pushCheck(taskId,nw);
+          updProg();
+        });
+        cs.appendChild(citem);
+        // 메모 폼+뷰
+        var cMemoWrap=document.createElement('div');
+        cMemoWrap.innerHTML=makeMemoHtml(taskId);
+        cs.appendChild(cMemoWrap);
+      });
+      body.appendChild(cs);
+    }
+
     dt.forEach(function(t){
       var gIdx=appData.tasks.indexOf(t);
       var cat=t['구분'];
@@ -473,7 +621,59 @@ function buildCards(){
       if(cat==='slack'){
         var sl=document.createElement('div'); sl.className='slack-row';
         sl.innerHTML='💬 '+t['시간']+' — 배운 내용을 <span class="sl-ch">#cx_교육</span>&nbsp;채널에 기재하기';
-        body.appendChild(sl); return;
+        body.appendChild(sl);
+
+        // 미완료 항목 다음 일차로 넘기기 버튼
+        var dayIdx2=days.indexOf(day);
+        if(dayIdx2 < days.length-1){
+          var nextDay=days[dayIdx2+1];
+          // 미완료 개수 미리 계산해서 버튼 표시
+          var unfinishedTasks=dt.filter(function(t){
+            return t['구분']==='task' && !appData.checks[makeTaskId(t,appData.tasks.indexOf(t))];
+          });
+          if(unfinishedTasks.length){
+            var cbtn=document.createElement('button');
+            cbtn.className='carry-btn';
+            cbtn.innerHTML='⚠️ 미완료 항목 '+unfinishedTasks.length+'개';
+            cbtn.onclick=function(){
+              var unfinished=dt.filter(function(t){
+                return t['구분']==='task' && !appData.checks[makeTaskId(t,appData.tasks.indexOf(t))];
+              });
+              if(!unfinished.length){ toast('모든 항목이 완료됐어요!','ok'); return; }
+              if(!carryOver[nextDay]) carryOver[nextDay]=[];
+              unfinished.forEach(function(t){
+                var tid=makeTaskId(t,appData.tasks.indexOf(t));
+                var lks=(t['링크']||'').toString().trim();
+                var exists=carryOver[nextDay].some(function(c){ return c.taskId===tid; });
+                if(!exists) carryOver[nextDay].push({taskId:tid, label:t['내용'], time:t['시간']||'', links:lks});
+              });
+              saveCarry();
+              cbtn.innerHTML='✅ '+nextDay+'로 넘겼어요';
+              cbtn.disabled=true;
+              toast(unfinished.length+'개 항목을 '+nextDay+'로 넘겼어요','ok');
+              buildCards();
+            };
+            body.appendChild(cbtn);
+          }
+        }
+
+        // 교육 소감 작성 폼
+        var fw=document.createElement('div'); fw.className='feedback-wrap';
+        var fbId='fb-'+dayId;
+        fw.innerHTML=
+          '<button class="feedback-btn" onclick="toggleFeedback(''+fbId+'')">📝 오늘의 교육 소감 작성하기</button>'+
+          '<div class="feedback-form" id="'+fbId+'">'+
+            '<label class="ff-label">✅ 오늘 배운 내용</label>'+
+            '<textarea class="ff-textarea" id="'+fbId+'-learned" placeholder="오늘 배운 내용을 자유롭게 작성해주세요" rows="3"></textarea>'+
+            '<label class="ff-label">🤔 어려웠던 점</label>'+
+            '<textarea class="ff-textarea" id="'+fbId+'-difficult" placeholder="이해하기 어려웠던 부분이 있었나요?" rows="2"></textarea>'+
+            '<label class="ff-label">💬 건의사항</label>'+
+            '<textarea class="ff-textarea" id="'+fbId+'-suggestion" placeholder="담당자에게 전달할 사항이 있으면 작성해주세요" rows="2"></textarea>'+
+            '<button class="ff-submit" id="'+fbId+'-btn" onclick="submitFeedback(''+fbId+'',''+day+'')">제출하기</button>'+
+            '<div class="ff-done" id="'+fbId+'-done">✅ 소감이 제출됐어요! 담당자가 확인할게요 😊</div>'+
+          '</div>';
+        body.appendChild(fw);
+        return;
       }
       var taskId=makeTaskId(t,gIdx);
       var isChk=!!appData.checks[taskId];
@@ -496,9 +696,11 @@ function buildCards(){
           return '<a class="tlink" href="'+lk.url+'" target="_blank">📎 '+lk.label+'</a>';
         }).join('')+'</div>';
       }
-      item.innerHTML='<div class="tcb"></div><div class="tb"><div class="tt">'+t['시간']+'</div><div class="tl">'+t['내용']+'</div>'+linkHtml+'</div>';
+      var memoHasData = memoData[taskId] && memoData[taskId].text;
+      item.innerHTML='<div class="tcb"></div><div class="tb"><div class="tt">'+t['시간']+'</div><div class="tl">'+t['내용']+'</div>'+linkHtml+'</div><button class="memo-btn'+(memoHasData?' has-memo':'')+'" id="mb-'+taskId+'" onclick="event.stopPropagation();clickMemoBtn(''+taskId+'')">'+(memoHasData?'메모 ✓':'메모')+'</button>';
       item.addEventListener('click', function(e){
         if(e.target.classList.contains('tlink')) return;
+        if(e.target.classList.contains('memo-btn')) return;
         var nw=!appData.checks[taskId];
         appData.checks[taskId]=nw;
         item.classList.toggle('ck',nw);
@@ -508,8 +710,96 @@ function buildCards(){
         updProg();
       });
       body.appendChild(item);
+      // 메모 폼+뷰 추가
+      var memoWrap=document.createElement('div');
+      memoWrap.innerHTML=makeMemoHtml(taskId);
+      // 기존 메모 있으면 뷰 내용 채우기
+      body.appendChild(memoWrap);
     });
   });
+}
+
+function toggleFeedback(id){
+  var form = document.getElementById(id);
+  if(form) form.classList.toggle('open');
+}
+
+function submitFeedback(fbId, day){
+  var learned    = (document.getElementById(fbId+'-learned')   ||{}).value||'';
+  var difficult  = (document.getElementById(fbId+'-difficult') ||{}).value||'';
+  var suggestion = (document.getElementById(fbId+'-suggestion')||{}).value||'';
+  if(!learned && !difficult && !suggestion){
+    toast('최소 한 항목 이상 작성해주세요','err'); return;
+  }
+  var btn = document.getElementById(fbId+'-btn');
+  if(btn){ btn.disabled=true; btn.textContent='제출 중...'; }
+  pushFeedback(day, learned, difficult, suggestion, function(ok){
+    if(ok){
+      var doneEl = document.getElementById(fbId+'-done');
+      if(doneEl) doneEl.classList.add('show');
+      if(btn) btn.style.display='none';
+    } else {
+      if(btn){ btn.disabled=false; btn.textContent='제출하기'; }
+      toast('제출 실패. 다시 시도해주세요','err');
+    }
+  });
+}
+
+function autoResize(el){
+  el.style.height='auto';
+  el.style.height=el.scrollHeight+'px';
+}
+
+function clickMemoBtn(taskId){
+  var hasMemo = memoData[taskId] && memoData[taskId].text;
+  var form = document.getElementById('mf-'+taskId);
+  var view = document.getElementById('mv-'+taskId);
+  if(hasMemo){
+    // 보기/숨기기 토글
+    memoData[taskId].visible = !memoData[taskId].visible;
+    if(view) view.classList.toggle('open', memoData[taskId].visible);
+    if(form) form.classList.remove('open');
+  } else {
+    if(form) form.classList.toggle('open');
+  }
+}
+
+function saveMemoBtn(taskId){
+  var ta = document.getElementById('mta-'+taskId);
+  var btn = document.getElementById('mb-'+taskId);
+  var view = document.getElementById('mv-'+taskId);
+  if(!ta || !ta.value.trim()){ toast('메모 내용을 입력해주세요','err'); return; }
+  memoData[taskId] = {text: ta.value.trim(), visible: false};
+  saveMemoStore();
+  if(btn){ btn.textContent='메모 ✓'; btn.classList.add('has-memo'); }
+  if(view){
+    view.classList.remove('open');
+    view.innerHTML='<div class="memo-bubble"><span>📌</span><span class="memo-bubble-text">'+ta.value.trim()+'</span><button class="memo-edit" onclick="editMemoBtn(''+taskId+'')">수정</button></div>';
+  }
+  var form = document.getElementById('mf-'+taskId);
+  if(form) form.classList.remove('open');
+  toast('메모가 저장됐어요','ok');
+}
+
+function editMemoBtn(taskId){
+  var view = document.getElementById('mv-'+taskId);
+  var form = document.getElementById('mf-'+taskId);
+  var ta = document.getElementById('mta-'+taskId);
+  if(view) view.classList.remove('open');
+  if(form) form.classList.add('open');
+  if(memoData[taskId]) memoData[taskId].visible = false;
+  if(ta) setTimeout(function(){ autoResize(ta); }, 0);
+}
+
+function cancelMemoBtn(taskId){
+  var form = document.getElementById('mf-'+taskId);
+  if(form) form.classList.remove('open');
+}
+
+function makeMemoHtml(taskId){
+  var existing = memoData[taskId] ? memoData[taskId].text : '';
+  var hasMemo = !!existing;
+  return '<div class="memo-form" id="mf-'+taskId+'"><textarea class="memo-ta" id="mta-'+taskId+'" oninput="autoResize(this)" placeholder="이 항목에 대한 메모를 자유롭게 남겨보세요...">'+existing+'</textarea><div class="memo-actions"><button class="memo-save" onclick="saveMemoBtn(''+taskId+'')">저장</button><button class="memo-cancel" onclick="cancelMemoBtn(''+taskId+'')">취소</button></div></div><div class="memo-view" id="mv-'+taskId+'"><div class="memo-bubble"><span>📌</span><span class="memo-bubble-text">'+existing+'</span><button class="memo-edit" onclick="editMemoBtn(''+taskId+'')">수정</button></div></div>';
 }
 
 function togDay(id){
