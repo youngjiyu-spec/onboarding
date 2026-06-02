@@ -668,18 +668,39 @@ function buildCards(){
         // 교육 소감 작성 폼
         var fw=document.createElement('div'); fw.className='feedback-wrap';
         var fbId='fb-'+dayId;
-        fw.innerHTML=
-          '<button class="feedback-btn" onclick="toggleFeedback(''+fbId+'')">📝 오늘의 교육 소감 작성하기</button>'+
-          '<div class="feedback-form" id="'+fbId+'">'+
-            '<label class="ff-label">✅ 오늘 배운 내용</label>'+
-            '<textarea class="ff-textarea" id="'+fbId+'-learned" placeholder="오늘 배운 내용을 자유롭게 작성해주세요" rows="3"></textarea>'+
-            '<label class="ff-label">🤔 어려웠던 점</label>'+
-            '<textarea class="ff-textarea" id="'+fbId+'-difficult" placeholder="이해하기 어려웠던 부분이 있었나요?" rows="2"></textarea>'+
-            '<label class="ff-label">💬 건의사항</label>'+
-            '<textarea class="ff-textarea" id="'+fbId+'-suggestion" placeholder="담당자에게 전달할 사항이 있으면 작성해주세요" rows="2"></textarea>'+
-            '<button class="ff-submit" id="'+fbId+'-btn" onclick="submitFeedback(''+fbId+'',''+day+'')">제출하기</button>'+
-            '<div class="ff-done" id="'+fbId+'-done">✅ 소감이 제출됐어요! 담당자가 확인할게요 😊</div>'+
-          '</div>';
+        // feedback DOM 방식 생성
+        var fbBtn = document.createElement('button');
+        fbBtn.className = 'feedback-btn';
+        fbBtn.textContent = '📝 오늘의 교육 소감 작성하기';
+        fbBtn.onclick = function(){ toggleFeedback(fbId); };
+
+        var fbForm = document.createElement('div');
+        fbForm.className = 'feedback-form';
+        fbForm.id = fbId;
+
+        var lb1 = document.createElement('label'); lb1.className='ff-label'; lb1.textContent='✅ 오늘 배운 내용';
+        var ta1 = document.createElement('textarea'); ta1.className='ff-textarea'; ta1.id=fbId+'-learned'; ta1.placeholder='오늘 배운 내용을 자유롭게 작성해주세요'; ta1.rows=3;
+        var lb2 = document.createElement('label'); lb2.className='ff-label'; lb2.textContent='🤔 어려웠던 점';
+        var ta2 = document.createElement('textarea'); ta2.className='ff-textarea'; ta2.id=fbId+'-difficult'; ta2.placeholder='이해하기 어려웠던 부분이 있었나요?'; ta2.rows=2;
+        var lb3 = document.createElement('label'); lb3.className='ff-label'; lb3.textContent='💬 건의사항';
+        var ta3 = document.createElement('textarea'); ta3.className='ff-textarea'; ta3.id=fbId+'-suggestion'; ta3.placeholder='담당자에게 전달할 사항이 있으면 작성해주세요'; ta3.rows=2;
+
+        var fbSubmit = document.createElement('button');
+        fbSubmit.className = 'ff-submit';
+        fbSubmit.id = fbId+'-btn';
+        fbSubmit.textContent = '제출하기';
+        (function(fid, d){ fbSubmit.onclick = function(){ submitFeedback(fid, d); }; })(fbId, day);
+
+        var fbDone = document.createElement('div');
+        fbDone.className = 'ff-done';
+        fbDone.id = fbId+'-done';
+        fbDone.textContent = '✅ 소감이 제출됐어요! 담당자가 확인할게요 😊';
+
+        fbForm.appendChild(lb1); fbForm.appendChild(ta1);
+        fbForm.appendChild(lb2); fbForm.appendChild(ta2);
+        fbForm.appendChild(lb3); fbForm.appendChild(ta3);
+        fbForm.appendChild(fbSubmit); fbForm.appendChild(fbDone);
+        fw.appendChild(fbBtn); fw.appendChild(fbForm);
         body.appendChild(fw);
         return;
       }
