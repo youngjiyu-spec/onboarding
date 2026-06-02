@@ -582,14 +582,22 @@ function buildCards(){
         }
 
         var cMemoHas = memoData[taskId] && memoData[taskId].text;
-        citem.innerHTML=
-          '<div class="carry-cb"></div>'+
-          '<div class="tb" style="flex:1">'+
-            '<div class="tt" style="color:#dc2626">미완료</div>'+
-            '<div class="carry-label tl">'+ct.label+'</div>'+
-            linkHtml+
-          '</div>'+
-          '<button class="memo-btn'+(cMemoHas?' has-memo':'')+'" id="mb-'+taskId+'" onclick="event.stopPropagation();clickMemoBtn(''+taskId+'')">'+(cMemoHas?'메모 ✓':'메모')+'</button>';
+
+        // DOM 방식으로 안전하게 생성
+        var ccb = document.createElement('div'); ccb.className='carry-cb';
+        var ctb = document.createElement('div'); ctb.className='tb'; ctb.style.flex='1';
+        var ctt = document.createElement('div'); ctt.className='tt'; ctt.style.color='#dc2626'; ctt.textContent='미완료';
+        var clbl = document.createElement('div'); clbl.className='carry-label tl'; clbl.textContent=ct.label;
+        ctb.appendChild(ctt); ctb.appendChild(clbl);
+        if(linkHtml){ var tmp=document.createElement('div'); tmp.innerHTML=linkHtml; ctb.appendChild(tmp.firstChild); }
+
+        var cmb = document.createElement('button');
+        cmb.className='memo-btn'+(cMemoHas?' has-memo':'');
+        cmb.id='mb-'+taskId;
+        cmb.textContent=cMemoHas?'메모 ✓':'메모';
+        cmb.onclick=function(e){ e.stopPropagation(); clickMemoBtn(taskId); };
+
+        citem.appendChild(ccb); citem.appendChild(ctb); citem.appendChild(cmb);
 
         citem.addEventListener('click',function(e){
           if(e.target.classList.contains('tlink')) return;
@@ -697,7 +705,22 @@ function buildCards(){
         }).join('')+'</div>';
       }
       var memoHasData = memoData[taskId] && memoData[taskId].text;
-      item.innerHTML='<div class="tcb"></div><div class="tb"><div class="tt">'+t['시간']+'</div><div class="tl">'+t['내용']+'</div>'+linkHtml+'</div><button class="memo-btn'+(memoHasData?' has-memo':'')+'" id="mb-'+taskId+'" onclick="event.stopPropagation();clickMemoBtn(''+taskId+'')">'+(memoHasData?'메모 ✓':'메모')+'</button>';
+
+      // DOM 방식으로 안전하게 생성
+      var tcb = document.createElement('div'); tcb.className='tcb';
+      var tb = document.createElement('div'); tb.className='tb';
+      var tt = document.createElement('div'); tt.className='tt'; tt.textContent=t['시간'];
+      var tl = document.createElement('div'); tl.className='tl'; tl.textContent=t['내용'];
+      tb.appendChild(tt); tb.appendChild(tl);
+      if(linkHtml){ var ltmp=document.createElement('div'); ltmp.innerHTML=linkHtml; tb.appendChild(ltmp.firstChild); }
+
+      var memobtn = document.createElement('button');
+      memobtn.className='memo-btn'+(memoHasData?' has-memo':'');
+      memobtn.id='mb-'+taskId;
+      memobtn.textContent=memoHasData?'메모 ✓':'메모';
+      memobtn.onclick=function(e){ e.stopPropagation(); clickMemoBtn(taskId); };
+
+      item.appendChild(tcb); item.appendChild(tb); item.appendChild(memobtn);
       item.addEventListener('click', function(e){
         if(e.target.classList.contains('tlink')) return;
         if(e.target.classList.contains('memo-btn')) return;
