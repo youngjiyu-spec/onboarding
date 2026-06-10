@@ -75,7 +75,7 @@ section{margin-bottom:28px}
 .notice{background:var(--brand-l);border:1px solid var(--brand-b);border-radius:var(--rl);padding:14px 18px}
 .notice li{display:flex;gap:7px;font-size:13px;color:#3730a3;margin-bottom:5px;line-height:1.6;list-style:none}
 .notice li:last-child{margin:0}.notice li::before{content:'·';font-weight:700;flex-shrink:0}
-.cal{display:grid;grid-template-columns:62px repeat(5,1fr);background:var(--sur);border:1px solid var(--bor);border-radius:var(--rl);overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.05);min-width:520px}
+.cal{display:grid;grid-template-columns:62px repeat(var(--day-count,5),1fr);background:var(--sur);border:1px solid var(--bor);border-radius:var(--rl);overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.05);min-width:520px}
 .ch{background:var(--sur2);padding:8px 5px;text-align:center;font-size:11px;color:var(--t3);font-weight:500;border-bottom:1px solid var(--bor)}
 .chd{background:var(--brand);color:#fff;padding:8px 5px;text-align:center;font-size:11px;font-weight:700;border-bottom:1px solid var(--bor);border-left:1px solid rgba(255,255,255,.15)}
 .ct{background:var(--sur2);border-top:1px solid var(--bor);border-right:1px solid var(--bor);padding:3px 5px;font-size:9.5px;color:var(--t3);text-align:right}
@@ -481,53 +481,79 @@ function buildCalendar(){
   var slots=['09:00','09:30','10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00','18:30'];
   var days=[];
   appData.tasks.forEach(function(t){ if(days.indexOf(t['일차'])<0) days.push(t['일차']); });
-  var blocks=[
-    {col:1,rs:0,re:3,l:'People팀 온보딩',cls:'gy'},{col:1,rs:4,re:5,l:'점심',cls:'gy'},{col:1,rs:6,re:6,l:'정비',cls:'gy'},
-    {col:1,rs:7,re:7,l:'CX팀 소개',cls:'br'},{col:1,rs:8,re:8,l:'프로필·캘린더·슬랙',cls:'br'},{col:1,rs:9,re:9,l:'스케줄링·시프티',cls:'br'},
-    {col:1,rs:10,re:10,l:'휴식',cls:'gy'},{col:1,rs:11,re:11,l:'IShopCARE',cls:'br'},{col:1,rs:12,re:13,l:'계정 설정',cls:'br'},
-    {col:1,rs:14,re:14,l:'휴식',cls:'gy'},{col:1,rs:15,re:15,l:'VAN·결제',cls:'br'},{col:1,rs:16,re:16,l:'구매상담',cls:'br'},{col:1,rs:17,re:17,l:'자사몰',cls:'br'},
-    {col:2,rs:0,re:2,l:'이벤트팀 소개',cls:'br'},{col:2,rs:3,re:3,l:'휴식',cls:'gy'},{col:2,rs:4,re:5,l:'판매유형',cls:'br'},
-    {col:2,rs:6,re:7,l:'점심',cls:'gy'},{col:2,rs:8,re:8,l:'정비',cls:'gy'},{col:2,rs:9,re:10,l:'인터넷·배달',cls:'br'},
-    {col:2,rs:11,re:13,l:'출고·배송',cls:'br'},{col:2,rs:14,re:16,l:'서류·청약',cls:'br'},{col:2,rs:17,re:18,l:'반품·교환',cls:'br'},
-    {col:3,rs:0,re:1,l:'채널톡 상담',cls:'br'},{col:3,rs:2,re:2,l:'상담태그',cls:'br'},{col:3,rs:3,re:4,l:'매크로 스터디',cls:'ok'},
-    {col:3,rs:5,re:6,l:'점심',cls:'gy'},{col:3,rs:7,re:7,l:'정비',cls:'gy'},{col:3,rs:8,re:8,l:'Q&A',cls:'ok'},
-    {col:3,rs:9,re:10,l:'IS팀 동석',cls:'wn'},{col:3,rs:11,re:13,l:'토스포스 기능',cls:'br'},{col:3,rs:14,re:15,l:'선불형',cls:'br'},{col:3,rs:16,re:17,l:'토스오더·키오스크',cls:'br'},
-    {col:4,rs:0,re:0,l:'토스포스 복습',cls:'ok'},{col:4,rs:1,re:2,l:'선불형 복습',cls:'ok'},{col:4,rs:3,re:3,l:'휴식',cls:'gy'},
-    {col:4,rs:4,re:4,l:'Q&A',cls:'ok'},{col:4,rs:5,re:6,l:'점심',cls:'gy'},{col:4,rs:7,re:7,l:'정비',cls:'gy'},
-    {col:4,rs:8,re:11,l:'후불형 기능',cls:'br'},{col:4,rs:12,re:15,l:'조합별 연결',cls:'br'},{col:4,rs:16,re:17,l:'셀프+Q&A',cls:'ok'},
-    {col:5,rs:0,re:0,l:'자대리점',cls:'br'},{col:5,rs:1,re:1,l:'OFF PG',cls:'br'},{col:5,rs:2,re:2,l:'휴식',cls:'gy'},
-    {col:5,rs:3,re:4,l:'CMS·위약금',cls:'br'},{col:5,rs:5,re:6,l:'점심',cls:'gy'},{col:5,rs:7,re:7,l:'정비',cls:'gy'},
-    {col:5,rs:8,re:8,l:'복수가맹·문화비',cls:'br'},{col:5,rs:9,re:9,l:'휴대용 단말기',cls:'br'},{col:5,rs:10,re:10,l:'VAN 용어',cls:'br'},
-    {col:5,rs:11,re:11,l:'휴식',cls:'gy'},{col:5,rs:12,re:18,l:'VAN 한판 정리',cls:'br'}
-  ];
+  var dayCount = days.length;
+
+  // CSS 변수로 day count 설정
+  document.documentElement.style.setProperty('--day-count', dayCount);
+
   var rows=slots.length-1;
-  var grid=document.createElement('div'); grid.className='cal';
+  var grid=document.createElement('div');
+  grid.className='cal';
+  grid.style.gridTemplateColumns='62px repeat('+dayCount+',1fr)';
+
+  // 헤더
   var hd='<div class="ch">시간</div>';
-  var workdays = URL_START ? getWorkdays(URL_START, days.length) : [];
-  days.forEach(function(d, idx){
-    var dt = workdays.length ? workdays[idx].slice(5).replace('-','/') : (function(){
-      var t=appData.tasks.find(function(x){ return x['일차']===d; });
-      return t?fmtDate(t['날짜']||''):'';
-    })();
+  days.forEach(function(d){
+    var t=appData.tasks.find(function(x){ return x['일차']===d; });
+    var dt=t?fmtDate(t['날짜']||''):'';
     hd+='<div class="chd">'+dt+'<br><span style="font-size:9px;opacity:.8">'+d+'</span></div>';
   });
   grid.innerHTML=hd;
+
+  // 일차별 task 블록 동적 생성
+  // 각 일차별로 task 항목들을 시간 기준으로 배치
+  var timeToRow = {};
+  slots.forEach(function(s,i){ timeToRow[s]=i; });
+
+  // 각 컬럼별 블록 계산
+  var colBlocks = [];
+  days.forEach(function(day, colIdx){
+    var dayTasks = appData.tasks.filter(function(t){ return t['일차']===day && t['구분']!==''; });
+    var blocks = [];
+    dayTasks.forEach(function(t){
+      var timeStr = (t['시간']||'').split('–')[0].split('–')[0].trim();
+      var endStr = (t['시간']||'').split('–')[1] ? (t['시간']||'').split('–')[1].trim() : '';
+      var rs = timeToRow[timeStr];
+      var re = endStr && timeToRow[endStr] !== undefined ? timeToRow[endStr]-1 : rs;
+      if(rs === undefined) return;
+      if(re < rs) re = rs;
+      var cat = t['구분'];
+      var cls = cat==='task'?'br': cat==='break'?'gy': cat==='slack'?'wn':'gy';
+      var label = t['내용'] || (cat==='slack'?'슬랙':'');
+      blocks.push({rs:rs, re:re, label:label, cls:cls});
+    });
+    colBlocks.push(blocks);
+  });
+
+  // 그리드 행 생성
   for(var ri=0;ri<rows;ri++){
-    var tEl=document.createElement('div'); tEl.className='ct'; tEl.textContent=slots[ri]; grid.appendChild(tEl);
-    for(var col=1;col<=5;col++){
-      var blk=blocks.find(function(b){ return b.col===col&&b.rs===ri; });
-      var cov=blocks.find(function(b){ return b.col===col&&b.rs<ri&&b.re>=ri; });
+    var tEl=document.createElement('div');
+    tEl.className='ct';
+    tEl.textContent=slots[ri];
+    grid.appendChild(tEl);
+
+    for(var col=0;col<dayCount;col++){
+      var blocks = colBlocks[col] || [];
+      var blk = blocks.find(function(b){ return b.rs===ri; });
+      var cov = blocks.find(function(b){ return b.rs<ri && b.re>=ri; });
       if(blk){
         var sp=blk.re-blk.rs+1;
-        var c=document.createElement('div'); c.className='cc'; c.style.gridRow='span '+sp;
-        c.innerHTML='<div class="cb '+blk.cls+'">'+blk.l+'</div>';
+        var c=document.createElement('div');
+        c.className='cc';
+        c.style.gridRow='span '+sp;
+        c.innerHTML='<div class="cb '+blk.cls+'">'+blk.label+'</div>';
         grid.appendChild(c);
       } else if(!cov){
-        var ec=document.createElement('div'); ec.className='cc'; grid.appendChild(ec);
+        var ec=document.createElement('div');
+        ec.className='cc';
+        grid.appendChild(ec);
       }
     }
   }
-  var wrap=document.getElementById('calWrap'); wrap.innerHTML=''; wrap.appendChild(grid);
+
+  var wrap=document.getElementById('calWrap');
+  wrap.innerHTML='';
+  wrap.appendChild(grid);
 }
 
 function buildCards(){
@@ -611,8 +637,7 @@ function buildCards(){
         });
         cs.appendChild(citem);
         // 메모 폼+뷰
-        var cMemoWrap=document.createElement('div');
-        cMemoWrap.innerHTML=makeMemoHtml(taskId);
+        var cMemoWrap=makeMemoHtml(taskId);
         cs.appendChild(cMemoWrap);
       });
       body.appendChild(cs);
@@ -745,6 +770,12 @@ function buildCards(){
       item.addEventListener('click', function(e){
         if(e.target.classList.contains('tlink')) return;
         if(e.target.classList.contains('memo-btn')) return;
+        if(e.target.classList.contains('memo-save')) return;
+        if(e.target.classList.contains('memo-cancel')) return;
+        if(e.target.classList.contains('memo-edit')) return;
+        if(e.target.classList.contains('memo-ta')) return;
+        if(e.target.closest('.memo-form')) return;
+        if(e.target.closest('.memo-view')) return;
         var nw=!appData.checks[taskId];
         appData.checks[taskId]=nw;
         item.classList.toggle('ck',nw);
@@ -755,9 +786,7 @@ function buildCards(){
       });
       body.appendChild(item);
       // 메모 폼+뷰 추가
-      var memoWrap=document.createElement('div');
-      memoWrap.innerHTML=makeMemoHtml(taskId);
-      // 기존 메모 있으면 뷰 내용 채우기
+      var memoWrap=makeMemoHtml(taskId);
       body.appendChild(memoWrap);
     });
   });
@@ -899,7 +928,7 @@ function makeMemoHtml(taskId){
 
   wrap.appendChild(form);
   wrap.appendChild(view);
-  return wrap.outerHTML;
+  return wrap;
 }
 
 function togDay(id){
