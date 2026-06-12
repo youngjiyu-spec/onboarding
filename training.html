@@ -460,6 +460,20 @@ function buildCards(tab){
         el.innerHTML='<span>'+t['시간']+'</span><span style="color:var(--bor)">·</span><span>'+t['내용']+(t['내용']==='점심'?' 🍚':'')+'</span>';
         body.appendChild(el); return;
       }
+      if(cat==='desc'){
+        var desc=document.createElement('div');
+        desc.style.cssText='background:rgba(13,122,95,.06);border-left:3px solid #0d7a5f;border-radius:0 8px 8px 0;padding:10px 12px;margin:6px 0 10px;font-size:12px;color:var(--t2);line-height:1.8';
+        // 줄바꿈 처리
+        var rawText = (t['내용']||'').toString();
+        var lines = rawText.split(/\n|\r\n|▶|►/).map(function(l){ return l.trim(); }).filter(function(l){ return l; });
+        if(lines.length > 1){
+          desc.innerHTML = '<div style="font-weight:600;color:#0d7a5f;margin-bottom:6px">'+lines[0]+'</div>'
+            + lines.slice(1).map(function(l){ return '<div style="display:flex;gap:6px;padding:1px 0"><span style="color:#0d7a5f;flex-shrink:0">▸</span><span>'+l+'</span></div>'; }).join('');
+        } else {
+          desc.textContent = rawText;
+        }
+        body.appendChild(desc); return;
+      }
       if(cat==='slack'){
         var sl=document.createElement('div'); sl.className='slack-row';
         sl.innerHTML='💬 '+t['시간']+' — 배운 내용을 <span style="font-family:monospace;background:#fed7aa;padding:1px 5px;border-radius:4px;font-size:10.5px">#cx_교육</span>&nbsp;채널에 기재하기';
