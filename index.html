@@ -237,6 +237,7 @@ section{margin-bottom:28px}
       <button class="tab" onclick="sw('sc')">📅 시간표</button>
       <button class="tab" onclick="sw('cl')">✅ 세부일정</button>
       <button class="tab" onclick="sw('lb')">📂 자료실</button>
+      <button class="tab" onclick="sw('fb')">💬 교육소감</button>
     </div>
     <div class="pane on" id="pane-ov">
       <section>
@@ -287,11 +288,17 @@ section{margin-bottom:28px}
         <div id="libWrap"></div>
       </section>
     </div>
+    <div class="pane" id="pane-fb">
+      <section>
+        <div class="sec-h"><div class="sec-ico">💬</div><div><div class="sec-t">교육 소감 모아보기</div><div class="sec-s">일차별로 제출된 소감을 확인할 수 있어요</div></div></div>
+        <div id="feedbackWrap"></div>
+      </section>
+    </div>
   </div>
 </div>
 </div>
 <script>
-var SHEET_API_URL = "https://script.google.com/macros/s/AKfycbzybDMImmaEKN_tOc1VUloOnPy1pWwC35dmvp5hzc5rSHCAK2HCJwi58PNnL8Me6V4b/exec";
+var SHEET_API_URL = "https://script.google.com/macros/s/AKfycbwvAECFjscszKy4E_v2YYEJ2GXtYQpR01Dv6IBUeOwFJUNASis_m3C8p8c4Cselg2Xs/exec";
 var URL_NAME = (function(){ var p = new URLSearchParams(window.location.search); return p.get('name') || ''; })();
 var URL_START = (function(){ var p = new URLSearchParams(window.location.search); return p.get('start') || ''; })();
 var appData = {config:{}, tasks:[], checks:{}, library:[], holidays:[]};
@@ -342,9 +349,12 @@ function getWorkdays(startStr, count){
 function makeTaskId(t, i){ return (t['일차']||'')+'_'+(t['순서']||i); }
 
 function sw(id){
-  document.querySelectorAll('.tab').forEach(function(t,i){ t.classList.toggle('on', ['ov','sc','cl','lb'][i]===id); });
+  document.querySelectorAll('.tab').forEach(function(t,i){ t.classList.toggle('on', ['ov','sc','cl','lb','fb'][i]===id); });
   document.querySelectorAll('.pane').forEach(function(p){ p.classList.remove('on'); });
   document.getElementById('pane-'+id).classList.add('on');
+  if(id==='fb'){
+    fetchFeedbacks(function(feedbacks){ buildFeedback(feedbacks); });
+  }
 }
 
 function jsonpFetch(url, onSuccess, onError){
@@ -416,6 +426,60 @@ function pushFeedback(day, learned, difficult, suggestion, onDone){
     function(r){ onDone(r && r.ok); },
     function(){ onDone(false); }
   );
+}
+
+function fetchFeedbacks(onDone){
+  jsonpFetch(SHEET_API_URL+'?action=getFeedbacks&name='+encodeURIComponent(URL_NAME),
+    function(data){ if(onDone) onDone(data.feedbacks||[]); },
+    function(){ if(onDone) onDone([]); }
+  );
+}
+
+function buildFeedback(feedbacks){
+  var wrap = document.getElementById('feedbackWrap'); 
+  if(!wrap) return;
+  wrap.innerHTML = '';
+  
+  // 일차 목록
+  var tasks = appData.tasks||[];
+  var days = [];
+  tasks.forEach(function(t){ if(days.indexOf(t['일차'])<0) days.push(t['일차']); });
+
+  if(!feedbacks.length){
+    wrap.innerHTML = '<div class="empty"><div class="empty-ico">💬</div><div class="empty-t">아직 제출된 소감이 없어요</div></div>';
+    return;
+  }
+
+  // 총 건수
+  var countEl = document.createElement('div');
+  countEl.style.cssText='font-size:12px;color:var(--t3);margin-bottom:14px;text-align:right';
+  countEl.textContent = '총 '+feedbacks.length+'건';
+  wrap.appendChild(countEl);
+
+  feedbacks.forEach(function(fb){
+    var card = document.createElement('div');
+    card.style.cssText='background:var(--sur);border:1px solid var(--bor);border-radius:var(--rl);padding:14px 18px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.05)';
+    
+    var header = document.createElement('div');
+    header.style.cssText='display:flex;align-items:center;justify-content:space-between;margin-bottom:10px';
+    
+    var pill = document.createElement('span');
+    pill.style.cssText='font-size:11px;padding:2px 8px;border-radius:99px;background:var(--brand-l);color:var(--brand);font-weight:600';
+    pill.textContent = fb['일차']||'';
+    
+    var time = document.createElement('span');
+    time.style.cssText='font-size:11px;color:var(--t3)';
+    time.textContent = fb['제출시각']||'';
+    
+    header.appendChild(pill); header.appendChild(time);
+    
+    var body = document.createElement('div');
+    body.style.cssText='font-size:13px;color:var(--t1);line-height:1.7;background:var(--sur2);border-radius:8px;padding:10px 12px;white-space:pre-wrap;word-break:break-word';
+    body.textContent = fb['오늘의 교육 소감']||fb['오늘 배운 내용']||fb['learned']||'';
+    
+    card.appendChild(header); card.appendChild(body);
+    wrap.appendChild(card);
+  });
 }
 
 function updProg(){
@@ -805,6 +869,10 @@ function submitFeedback(fbId, day){
       var doneEl = document.getElementById(fbId+'-done');
       if(doneEl) doneEl.classList.add('show');
       if(btn) btn.style.display='none';
+      var taEl = document.getElementById(fbId+'-learned');
+      if(taEl) taEl.style.display='none';
+      var lbEl = taEl ? taEl.previousElementSibling : null;
+      if(lbEl) lbEl.style.display='none';
     } else {
       if(btn){ btn.disabled=false; btn.textContent='제출하기'; }
       toast('제출 실패. 다시 시도해주세요','err');
