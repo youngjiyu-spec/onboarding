@@ -703,12 +703,8 @@ function buildCards(){
         fbForm.className = 'feedback-form';
         fbForm.id = fbId;
 
-        var lb1 = document.createElement('label'); lb1.className='ff-label'; lb1.textContent='✅ 오늘 배운 내용';
-        var ta1 = document.createElement('textarea'); ta1.className='ff-textarea'; ta1.id=fbId+'-learned'; ta1.placeholder='오늘 배운 내용을 자유롭게 작성해주세요'; ta1.rows=3;
-        var lb2 = document.createElement('label'); lb2.className='ff-label'; lb2.textContent='🤔 어려웠던 점';
-        var ta2 = document.createElement('textarea'); ta2.className='ff-textarea'; ta2.id=fbId+'-difficult'; ta2.placeholder='이해하기 어려웠던 부분이 있었나요?'; ta2.rows=2;
-        var lb3 = document.createElement('label'); lb3.className='ff-label'; lb3.textContent='💬 건의사항';
-        var ta3 = document.createElement('textarea'); ta3.className='ff-textarea'; ta3.id=fbId+'-suggestion'; ta3.placeholder='담당자에게 전달할 사항이 있으면 작성해주세요'; ta3.rows=2;
+        var lb1 = document.createElement('label'); lb1.className='ff-label'; lb1.textContent='📝 오늘의 교육 소감';
+        var ta1 = document.createElement('textarea'); ta1.className='ff-textarea'; ta1.id=fbId+'-learned'; ta1.placeholder='오늘 하루 교육 소감을 자유롭게 작성해주세요'; ta1.rows=5;
 
         var fbSubmit = document.createElement('button');
         fbSubmit.className = 'ff-submit';
@@ -722,8 +718,6 @@ function buildCards(){
         fbDone.textContent = '✅ 소감이 제출됐어요! 담당자가 확인할게요 😊';
 
         fbForm.appendChild(lb1); fbForm.appendChild(ta1);
-        fbForm.appendChild(lb2); fbForm.appendChild(ta2);
-        fbForm.appendChild(lb3); fbForm.appendChild(ta3);
         fbForm.appendChild(fbSubmit); fbForm.appendChild(fbDone);
         fw.appendChild(fbBtn); fw.appendChild(fbForm);
         body.appendChild(fw);
@@ -799,10 +793,10 @@ function toggleFeedback(id){
 
 function submitFeedback(fbId, day){
   var learned    = (document.getElementById(fbId+'-learned')   ||{}).value||'';
-  var difficult  = (document.getElementById(fbId+'-difficult') ||{}).value||'';
-  var suggestion = (document.getElementById(fbId+'-suggestion')||{}).value||'';
-  if(!learned && !difficult && !suggestion){
-    toast('최소 한 항목 이상 작성해주세요','err'); return;
+  var difficult  = '';
+  var suggestion = '';
+  if(!learned){
+    toast('소감을 작성해주세요','err'); return;
   }
   var btn = document.getElementById(fbId+'-btn');
   if(btn){ btn.disabled=true; btn.textContent='제출 중...'; }
