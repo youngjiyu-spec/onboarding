@@ -197,7 +197,7 @@ section{margin-bottom:28px}
 </div>
 </div>
 <script>
-var SHEET_API_URL = "https://script.google.com/macros/s/AKfycbyC1Yn-38VlJgppULKpvnDbFp_taCUwsdG0Cbbf0ukqjEQ_CRJUOCeoE9AXNffswMa_6w/exec";
+var SHEET_API_URL = "https://script.google.com/macros/s/AKfycbwmbNb_f9qY3DAWsxevvQq9jWfcjHW-xg8ikcrFYHs1MBoTQeslTQys7RjAm5UV8b0iwQ/exec";
 var URL_NAME = (function(){ var p=new URLSearchParams(window.location.search); return p.get('name')||''; })();
 var URL_START = (function(){ var p=new URLSearchParams(window.location.search); return p.get('start')||''; })();
 var URL_TAB = (function(){ var p=new URLSearchParams(window.location.search); return p.get('tab')||'chat'; })();
@@ -238,7 +238,16 @@ function fetchTab(tab, onDone){
       appData[tab].tasks = data.tasks||[];
       appData[tab].checks = data.checks||{};
       appData[tab].config = data.config||{};
-      if(onDone) onDone();
+      // 메모 시트에서 불러오기
+      jsonpFetch(SHEET_API_URL+'?action=getMemos&tab='+tab,
+        function(mData){
+          if(mData.memos){
+            Object.keys(mData.memos).forEach(function(k){ memoData[k]={text:mData.memos[k],visible:false}; });
+          }
+          if(onDone) onDone();
+        },
+        function(){ if(onDone) onDone(); }
+      );
     },
     function(){ if(onDone) onDone(); }
   );
@@ -372,6 +381,9 @@ function saveMemoBtn(taskId){
   if(!ta||!ta.value.trim()){ toast('메모 내용을 입력해주세요','err'); return; }
   memoData[taskId]={text:ta.value.trim(),visible:false};
   saveMemoStore();
+  // 시트에도 저장
+  jsonpFetch(SHEET_API_URL+'?action=saveMemo&tab='+currentTab+'&taskId='+encodeURIComponent(taskId)+'&memo='+encodeURIComponent(ta.value.trim()),
+    function(r){ if(r&&r.ok) setSyncDot('synced'); }, null);
   if(btn){ btn.textContent='메모 ✓'; btn.classList.add('has-memo'); }
   if(view){
     view.classList.remove('open');
