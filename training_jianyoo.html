@@ -219,7 +219,7 @@ function fmtDate(raw){
   if(s.indexOf('T')>0){ var d=new Date(s); var kst=new Date(d.getTime()+9*60*60*1000); var mm=String(kst.getUTCMonth()+1).padStart(2,'0'); var dd=String(kst.getUTCDate()).padStart(2,'0'); return mm+'/'+dd; }
   var parts=s.split('-'); if(parts.length>=3) return parts[1]+'/'+parts[2]; return s;
 }
-function makeTaskId(t,i){ return (t['일차']||'')+'_'+(t['순서']||i); }
+function makeTaskId(t,i){ return (t['일차']||'')+'_'+(t['순서']||i)+'_'+(t['내용']||'').toString().replace(/\s/g,'').slice(0,6); }
 function autoResize(el){ el.style.height='auto'; el.style.height=el.scrollHeight+'px'; }
 
 function jsonpFetch(url,onSuccess,onError){
