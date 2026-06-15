@@ -151,11 +151,11 @@ section{margin-bottom:28px}
     </div>
   </div>
   <div class="sb-div"></div>
-  <div class="sb-sec">
+  <div class="sb-sec" id="sbChatSection">
     <div class="sb-slbl">💬 채팅 상담</div>
     <div id="sbNavChat"></div>
   </div>
-  <div class="sb-div"></div>
+  <div class="sb-div" id="sbDivSection"></div>
   <div class="sb-sec">
     <div class="sb-slbl">📞 콜 상담</div>
     <div id="sbNavCall"></div>
@@ -200,7 +200,8 @@ section{margin-bottom:28px}
 var SHEET_API_URL = "https://script.google.com/macros/s/AKfycbw_46geX1pwnYVSpVUjHp6zocG8jvDCAui1CxesofZ8WFA5VNbHm-2uAOMNqInt6-7Q/exec";
 var URL_NAME = (function(){ var p=new URLSearchParams(window.location.search); return p.get('name')||''; })();
 var URL_START = (function(){ var p=new URLSearchParams(window.location.search); return p.get('start')||''; })();
-var currentTab = 'chat';
+var URL_TAB = (function(){ var p=new URLSearchParams(window.location.search); return p.get('tab')||'chat'; })();
+var currentTab = URL_TAB;
 var appData = { chat:{config:{},tasks:[],checks:{}}, call:{config:{},tasks:[],checks:{}} };
 var memoData = {};
 var carryOver = {};
@@ -250,6 +251,7 @@ function fetchAll(){
     fetchTab('call', function(){
       loading(false);
       renderAll();
+      switchTab(URL_TAB);
       setSyncDot('synced');
     });
   });
@@ -442,6 +444,12 @@ function buildCards(tab){
         citem.appendChild(ccb); citem.appendChild(ctb); citem.appendChild(cmb);
         citem.addEventListener('click',function(e){
           if(e.target.classList.contains('memo-btn')) return;
+          if(e.target.classList.contains('memo-save')) return;
+          if(e.target.classList.contains('memo-cancel')) return;
+          if(e.target.classList.contains('memo-edit')) return;
+          if(e.target.classList.contains('memo-ta')) return;
+          if(e.target.closest('.memo-form')) return;
+          if(e.target.closest('.memo-view')) return;
           var nw=!appData[tab].checks[taskId]; appData[tab].checks[taskId]=nw;
           citem.classList.toggle('carry-done',nw);
           var ld=citem.querySelector('.tlinks'); if(ld) ld.style.display=nw?'none':'flex';
@@ -581,6 +589,21 @@ function renderAll(){
   buildNav('chat'); buildNav('call');
   buildCards('chat'); buildCards('call');
   updProg();
+
+  // tab=call이면 채팅 관련 UI 완전히 숨김
+  if(URL_TAB === 'call'){
+    // 탭 카드에서 채팅 숨김
+    var chatCard = document.getElementById('tabcard-chat');
+    if(chatCard) chatCard.style.display = 'none';
+    // 사이드바 채팅 섹션 숨김
+    var sbChatSection = document.getElementById('sbChatSection');
+    if(sbChatSection) sbChatSection.style.display = 'none';
+    var sbDiv = document.getElementById('sbDivSection');
+    if(sbDiv) sbDiv.style.display = 'none';
+    // 탭 카드 그리드를 1칸으로
+    var tabCards = document.querySelector('.tab-cards');
+    if(tabCards) tabCards.style.gridTemplateColumns = '1fr';
+  }
 }
 
 fetchAll();
