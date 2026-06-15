@@ -242,7 +242,9 @@ function fetchTab(tab, onDone){
       jsonpFetch(SHEET_API_URL+'?action=getMemos&tab='+tab,
         function(mData){
           if(mData.memos){
-            Object.keys(mData.memos).forEach(function(k){ memoData[k]={text:mData.memos[k],visible:false}; });
+            Object.keys(mData.memos).forEach(function(k){
+              if(mData.memos[k]) memoData[k]={text:mData.memos[k],visible:false};
+            });
           }
           if(onDone) onDone();
         },
@@ -260,6 +262,7 @@ function fetchAll(){
     fetchTab('call', function(){
       loading(false);
       renderAll();
+      refreshMemoButtons();
       switchTab(URL_TAB);
       setSyncDot('synced');
     });
@@ -593,6 +596,27 @@ function buildCards(tab){
     fbForm.appendChild(lb1); fbForm.appendChild(ta1); fbForm.appendChild(lb2); fbForm.appendChild(ta2); fbForm.appendChild(lb3); fbForm.appendChild(ta3); fbForm.appendChild(fbSubmit); fbForm.appendChild(fbDone);
     fw.appendChild(fbBtn); fw.appendChild(fbForm);
     body.appendChild(fw);
+  });
+}
+
+function refreshMemoButtons(){
+  // 시트에서 받아온 메모 데이터로 버튼 UI 갱신
+  Object.keys(memoData).forEach(function(taskId){
+    var btn = document.getElementById('mb-'+taskId);
+    if(btn && memoData[taskId] && memoData[taskId].text){
+      btn.textContent = '메모 ✓';
+      btn.classList.add('has-memo');
+    }
+    var view = document.getElementById('mv-'+taskId);
+    if(view && memoData[taskId] && memoData[taskId].text){
+      var bubble = document.createElement('div'); bubble.className='memo-bubble';
+      var pin = document.createElement('span'); pin.textContent='📌';
+      var txt = document.createElement('span'); txt.className='memo-bubble-text'; txt.textContent=memoData[taskId].text;
+      var eb = document.createElement('button'); eb.className='memo-edit'; eb.textContent='수정';
+      (function(tid){ eb.onclick=function(){ editMemoBtn(tid); }; })(taskId);
+      bubble.appendChild(pin); bubble.appendChild(txt); bubble.appendChild(eb);
+      view.innerHTML=''; view.appendChild(bubble);
+    }
   });
 }
 
