@@ -238,18 +238,21 @@ function fetchTab(tab, onDone){
       appData[tab].tasks = data.tasks||[];
       appData[tab].checks = data.checks||{};
       appData[tab].config = data.config||{};
-      // 메모 시트에서 불러오기
-      jsonpFetch(SHEET_API_URL+'?action=getMemos&tab='+tab,
-        function(mData){
-          if(mData.memos){
-            Object.keys(mData.memos).forEach(function(k){
-              if(mData.memos[k]) memoData[k]={text:mData.memos[k],visible:false};
-            });
-          }
-          if(onDone) onDone();
-        },
-        function(){ if(onDone) onDone(); }
-      );
+      if(onDone) onDone();
+    },
+    function(){ if(onDone) onDone(); }
+  );
+}
+
+function fetchMemos(tab, onDone){
+  jsonpFetch(SHEET_API_URL+'?action=getMemos&tab='+tab,
+    function(mData){
+      if(mData && mData.memos){
+        Object.keys(mData.memos).forEach(function(k){
+          if(mData.memos[k]) memoData[k]={text:mData.memos[k],visible:false};
+        });
+      }
+      if(onDone) onDone();
     },
     function(){ if(onDone) onDone(); }
   );
@@ -258,13 +261,17 @@ function fetchTab(tab, onDone){
 function fetchAll(){
   if(!URL_NAME) document.getElementById('nameBanner').style.display='block';
   loading(true);
-  fetchTab('chat', function(){
-    fetchTab('call', function(){
-      loading(false);
-      renderAll();
-      refreshMemoButtons();
-      switchTab(URL_TAB);
-      setSyncDot('synced');
+  // 메모 먼저 받고, 그 다음 탭 데이터 받고, 마지막에 렌더링
+  fetchMemos('chat', function(){
+    fetchMemos('call', function(){
+      fetchTab('chat', function(){
+        fetchTab('call', function(){
+          loading(false);
+          renderAll();
+          switchTab(URL_TAB);
+          setSyncDot('synced');
+        });
+      });
     });
   });
 }
