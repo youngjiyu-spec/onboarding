@@ -341,9 +341,9 @@ function makeMemoHtml(taskId){
   ta.oninput=function(){ autoResize(this); };
   var actions=document.createElement('div'); actions.className='memo-actions';
   var saveBtn=document.createElement('button'); saveBtn.className='memo-save'; saveBtn.textContent='저장';
-  saveBtn.onclick=function(){ saveMemoBtn(taskId); };
+  (function(tid){ saveBtn.onclick=function(){ saveMemoBtn(tid); }; })(taskId);
   var cancelBtn=document.createElement('button'); cancelBtn.className='memo-cancel'; cancelBtn.textContent='취소';
-  cancelBtn.onclick=function(){ cancelMemoBtn(taskId); };
+  (function(tid){ cancelBtn.onclick=function(){ cancelMemoBtn(tid); }; })(taskId);
   actions.appendChild(saveBtn); actions.appendChild(cancelBtn); form.appendChild(ta); form.appendChild(actions);
   var view=document.createElement('div'); view.className='memo-view'; view.id='mv-'+taskId;
   if(existing){
@@ -351,7 +351,7 @@ function makeMemoHtml(taskId){
     var pin=document.createElement('span'); pin.textContent='📌';
     var txt=document.createElement('span'); txt.className='memo-bubble-text'; txt.textContent=existing;
     var eb=document.createElement('button'); eb.className='memo-edit'; eb.textContent='수정';
-    eb.onclick=function(){ editMemoBtn(taskId); };
+    (function(tid){ eb.onclick=function(){ editMemoBtn(tid); }; })(taskId);
     bubble.appendChild(pin); bubble.appendChild(txt); bubble.appendChild(eb); view.appendChild(bubble);
   }
   wrap.appendChild(form); wrap.appendChild(view);
@@ -379,7 +379,7 @@ function saveMemoBtn(taskId){
     var pin=document.createElement('span'); pin.textContent='📌';
     var txt=document.createElement('span'); txt.className='memo-bubble-text'; txt.textContent=ta.value.trim();
     var eb=document.createElement('button'); eb.className='memo-edit'; eb.textContent='수정';
-    eb.onclick=function(){ editMemoBtn(taskId); };
+    (function(tid){ eb.onclick=function(){ editMemoBtn(tid); }; })(taskId);
     bubble.appendChild(pin); bubble.appendChild(txt); bubble.appendChild(eb);
     view.innerHTML=''; view.appendChild(bubble);
   }
@@ -440,7 +440,7 @@ function buildCards(tab){
         var cMemoHas=memoData[taskId]&&memoData[taskId].text;
         var cmb=document.createElement('button'); cmb.className='memo-btn'+(cMemoHas?' has-memo':''); cmb.id='mb-'+taskId;
         cmb.textContent=cMemoHas?'메모 ✓':'메모';
-        cmb.onclick=function(e){ e.stopPropagation(); clickMemoBtn(taskId); };
+        (function(tid){ cmb.onclick=function(e){ e.stopPropagation(); clickMemoBtn(tid); }; })(taskId);
         citem.appendChild(ccb); citem.appendChild(ctb); citem.appendChild(cmb);
         citem.addEventListener('click',function(e){
           if(e.target.classList.contains('memo-btn')) return;
@@ -506,7 +506,7 @@ function buildCards(tab){
       var memoHasData=memoData[taskId]&&memoData[taskId].text;
       var memobtn=document.createElement('button'); memobtn.className='memo-btn'+(memoHasData?' has-memo':''); memobtn.id='mb-'+taskId;
       memobtn.textContent=memoHasData?'메모 ✓':'메모';
-      memobtn.onclick=function(e){ e.stopPropagation(); clickMemoBtn(taskId); };
+      (function(tid){ memobtn.onclick=function(e){ e.stopPropagation(); clickMemoBtn(tid); }; })(taskId);
       item.appendChild(tcb); item.appendChild(tb); item.appendChild(memobtn);
       item.addEventListener('click',function(e){
         if(e.target.classList.contains('tlink')) return;
@@ -609,7 +609,18 @@ function renderAll(){
 fetchAll();
 setInterval(function(){
   jsonpFetch(SHEET_API_URL+'?action=checks&tab='+currentTab+'&name='+encodeURIComponent(URL_NAME),
-    function(data){ if(data.checks){ appData[currentTab].checks=data.checks; buildCards(currentTab); updProg(); } }, null
+    function(data){
+      if(data.checks){
+        appData[currentTab].checks=data.checks;
+        // 메모 폼이 열려있으면 buildCards 실행 안 함
+        var openForm = document.querySelector('.memo-form.open');
+        var openView = document.querySelector('.memo-view.open');
+        if(!openForm && !openView){
+          buildCards(currentTab);
+        }
+        updProg();
+      }
+    }, null
   );
 }, 30000);
 </script>
