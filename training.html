@@ -199,7 +199,8 @@ section{margin-bottom:28px}
 <script>
 var SHEET_API_URL = "https://script.google.com/macros/s/AKfycbw_46geX1pwnYVSpVUjHp6zocG8jvDCAui1CxesofZ8WFA5VNbHm-2uAOMNqInt6-7Q/exec";
 var URL_NAME = (function(){ var p=new URLSearchParams(window.location.search); return p.get('name')||''; })();
-var URL_START = (function(){ var p=new URLSearchParams(window.location.search); return p.get('start')||''; })();
+var URL_CHAT_START = (function(){ var p=new URLSearchParams(window.location.search); return p.get('chatStart')||p.get('start')||''; })();
+var URL_CALL_START = (function(){ var p=new URLSearchParams(window.location.search); return p.get('callStart')||''; })();
 var URL_TAB = (function(){ var p=new URLSearchParams(window.location.search); return p.get('tab')||'chat'; })();
 var currentTab = URL_TAB;
 var appData = { chat:{config:{},tasks:[],checks:{}}, call:{config:{},tasks:[],checks:{}} };
@@ -218,6 +219,23 @@ function fmtDate(raw){
   var s=String(raw);
   if(s.indexOf('T')>0){ var d=new Date(s); var kst=new Date(d.getTime()+9*60*60*1000); var mm=String(kst.getUTCMonth()+1).padStart(2,'0'); var dd=String(kst.getUTCDate()).padStart(2,'0'); return mm+'/'+dd; }
   var parts=s.split('-'); if(parts.length>=3) return parts[1]+'/'+parts[2]; return s;
+}
+function getWorkdays(startStr, count){
+  var days=[];
+  if(!startStr) return days;
+  var parts=startStr.split('-');
+  if(parts.length<3) return days;
+  var d=new Date(parseInt(parts[0]),parseInt(parts[1])-1,parseInt(parts[2]));
+  while(days.length<count){
+    var dow=d.getDay();
+    if(dow!==0&&dow!==6){
+      var mm=String(d.getMonth()+1).padStart(2,'0');
+      var dd=String(d.getDate()).padStart(2,'0');
+      days.push(d.getFullYear()+'-'+mm+'-'+dd);
+    }
+    d.setDate(d.getDate()+1);
+  }
+  return days;
 }
 function makeTaskId(t,i){ return (t['일차']||'')+'_'+(t['순서']||i)+'_'+(t['내용']||'').toString().replace(/\s/g,'').slice(0,6); }
 function autoResize(el){ el.style.height='auto'; el.style.height=el.scrollHeight+'px'; }
@@ -238,18 +256,21 @@ function fetchTab(tab, onDone){
       appData[tab].tasks = data.tasks||[];
       appData[tab].checks = data.checks||{};
       appData[tab].config = data.config||{};
-      // 메모 시트에서 불러오기
-      jsonpFetch(SHEET_API_URL+'?action=getMemos&tab='+tab,
-        function(mData){
-          if(mData.memos){
-            Object.keys(mData.memos).forEach(function(k){
-              if(mData.memos[k]) memoData[k]={text:mData.memos[k],visible:false};
-            });
-          }
-          if(onDone) onDone();
-        },
-        function(){ if(onDone) onDone(); }
-      );
+      if(onDone) onDone();
+    },
+    function(){ if(onDone) onDone(); }
+  );
+}
+
+function fetchMemos(tab, onDone){
+  jsonpFetch(SHEET_API_URL+'?action=getMemos&tab='+tab,
+    function(mData){
+      if(mData && mData.memos){
+        Object.keys(mData.memos).forEach(function(k){
+          if(mData.memos[k]) memoData[k]={text:mData.memos[k],visible:false};
+        });
+      }
+      if(onDone) onDone();
     },
     function(){ if(onDone) onDone(); }
   );
@@ -258,13 +279,17 @@ function fetchTab(tab, onDone){
 function fetchAll(){
   if(!URL_NAME) document.getElementById('nameBanner').style.display='block';
   loading(true);
-  fetchTab('chat', function(){
-    fetchTab('call', function(){
-      loading(false);
-      renderAll();
-      refreshMemoButtons();
-      switchTab(URL_TAB);
-      setSyncDot('synced');
+  // 메모 먼저 받고, 그 다음 탭 데이터 받고, 마지막에 렌더링
+  fetchMemos('chat', function(){
+    fetchMemos('call', function(){
+      fetchTab('chat', function(){
+        fetchTab('call', function(){
+          loading(false);
+          renderAll();
+          switchTab(URL_TAB);
+          setSyncDot('synced');
+        });
+      });
     });
   });
 }
@@ -323,8 +348,10 @@ function buildNav(tab){
   var days=[];
   tasks.forEach(function(t){ if(days.indexOf(t['일차'])<0) days.push(t['일차']); });
   days.forEach(function(d){
-    var t=tasks.find(function(x){ return x['일차']===d; });
-    var dt=t?fmtDate(t['날짜']||''):'';
+    var navIdx=days.indexOf(d);
+    var navTabStart=tab==='call'?URL_CALL_START:URL_CHAT_START;
+    var workdaysNav=navTabStart?getWorkdays(navTabStart,days.length):[];
+    var dt=workdaysNav.length?workdaysNav[navIdx].slice(5).replace('-','/'):(function(){ var t=tasks.find(function(x){ return x['일차']===d; }); return t?fmtDate(t['날짜']||''):''; })();
     var btn=document.createElement('button');
     btn.className='sb-nav'; btn.dataset.daynav=d; btn.dataset.tab=tab;
     btn.innerHTML='<span class="sb-dot"></span>'+d+' <span style="opacity:.58;font-size:11px">'+(dt?'('+dt+')':'')+'</span>';
@@ -422,7 +449,10 @@ function buildCards(tab){
     var tot=rt.length;
     var done=rt.filter(function(t){ return appData[tab].checks[makeTaskId(t,tasks.indexOf(t))]; }).length;
     var isDone=tot&&done===tot;
-    var date=dt[0]?fmtDate(dt[0]['날짜']||''):'';
+    var dayIdxForDate=days.indexOf(day);
+    var tabStart=tab==='call'?URL_CALL_START:URL_CHAT_START;
+    var workdaysForTab=tabStart?getWorkdays(tabStart,days.length):[];
+    var date=workdaysForTab.length?workdaysForTab[dayIdxForDate].slice(5).replace('-','/'):(dt[0]?fmtDate(dt[0]['날짜']||''):'');
     var trainerSet={}; dt.forEach(function(t){ var tr=t['담당자']||''; if(tr) trainerSet[tr]=true; });
     var trainer=Object.keys(trainerSet).join(' · ');
     var dayId='day-'+tab+'-'+day.replace(/\s/g,'');
@@ -626,20 +656,7 @@ function renderAll(){
   buildCards('chat'); buildCards('call');
   updProg();
 
-  // tab=call이면 채팅 관련 UI 완전히 숨김
-  if(URL_TAB === 'call'){
-    // 탭 카드에서 채팅 숨김
-    var chatCard = document.getElementById('tabcard-chat');
-    if(chatCard) chatCard.style.display = 'none';
-    // 사이드바 채팅 섹션 숨김
-    var sbChatSection = document.getElementById('sbChatSection');
-    if(sbChatSection) sbChatSection.style.display = 'none';
-    var sbDiv = document.getElementById('sbDivSection');
-    if(sbDiv) sbDiv.style.display = 'none';
-    // 탭 카드 그리드를 1칸으로
-    var tabCards = document.querySelector('.tab-cards');
-    if(tabCards) tabCards.style.gridTemplateColumns = '1fr';
-  }
+  // tab 파라미터는 처음에 어떤 탭이 열릴지만 결정 (채팅/콜 모두 항상 보임)
 }
 
 fetchAll();
