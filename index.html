@@ -8,7 +8,7 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --brand:#4a26ff;--brand-h:#3b1fe0;--brand-l:rgba(74,38,255,.08);--brand-b:rgba(74,38,255,.22);
+  --brand:#5b8ec7;--brand-h:#3a6fa8;--brand-l:rgba(91,142,199,.08);--brand-b:rgba(91,142,199,.22);
   --t1:#111827;--t2:#4b5563;--t3:#9ca3af;
   --bg:#f8f7ff;--sur:#fff;--sur2:#f3f4f6;--bor:#e5e7eb;
   --ok:#10b981;--ok-b:#ecfdf5;--warn:#f59e0b;--warn-b:#fffbeb;
@@ -16,18 +16,18 @@
 }
 body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);color:var(--t1);min-height:100vh;font-size:14px;line-height:1.6}
 .app{display:flex;min-height:100vh}
-.sb{width:var(--sw);flex-shrink:0;background:var(--brand);color:#fff;position:fixed;top:0;left:0;bottom:0;overflow-y:auto;z-index:50;display:flex;flex-direction:column}
+.sb{width:var(--sw);flex-shrink:0;background:#f0f6fc;color:#111;border-right:2px solid #5b8ec7;position:fixed;top:0;left:0;bottom:0;overflow-y:auto;z-index:50;display:flex;flex-direction:column}
 .sb::-webkit-scrollbar{width:3px}.sb::-webkit-scrollbar-thumb{background:rgba(255,255,255,.2);border-radius:99px}
 .sb-head{padding:22px 18px 14px}
 .sb-logo{display:flex;align-items:center;gap:10px;margin-bottom:16px}
 .sb-badge{width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800}
-.sb-lt{font-size:14px;font-weight:700}.sb-ls{font-size:11px;opacity:.58;margin-top:1px}
-.sb-welcome{background:rgba(255,255,255,.1);border-radius:12px;padding:13px;margin-bottom:4px}
-.sb-wt{font-size:14px;font-weight:700;line-height:1.4;margin-bottom:5px}
-.sb-wd{font-size:11.5px;opacity:.8;line-height:1.7}
-.sb-div{height:1px;background:rgba(255,255,255,.12);margin:12px 16px}
+.sb-lt{font-size:14px;font-weight:700;color:#111}.sb-ls{font-size:11px;color:#85afd6;margin-top:1px}
+.sb-welcome{background:#e5f0fa;border:1px solid #85afd6;border-radius:12px;padding:13px;margin-bottom:4px}
+.sb-wt{font-size:14px;font-weight:700;line-height:1.4;margin-bottom:5px;color:#111}
+.sb-wd{font-size:11.5px;color:#888;line-height:1.7}
+.sb-div{height:1px;background:#b8d4ef;margin:12px 16px}
 .sb-sec{padding:0 14px 14px}
-.sb-slbl{font-size:10px;font-weight:700;opacity:.44;letter-spacing:.08em;text-transform:uppercase;padding:0 4px;margin-bottom:7px}
+.sb-slbl{font-size:10px;font-weight:700;color:#85afd6;letter-spacing:.08em;text-transform:uppercase;padding:0 4px;margin-bottom:7px}
 .sb-co{background:rgba(255,255,255,.08);border-radius:10px;padding:12px;margin:0 2px 2px}
 .sb-co-nm{font-size:13px;font-weight:700;margin-bottom:4px}
 .sb-co-ds{font-size:11px;opacity:.76;line-height:1.7;margin-bottom:7px}
@@ -37,16 +37,16 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
 .sb-learn-item:last-child{border:none}
 .sb-ln{width:16px;height:16px;border-radius:50%;background:rgba(255,255,255,.15);font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
 .sb-nav{display:flex;align-items:center;gap:7px;padding:6px 8px;border-radius:var(--r);cursor:pointer;font-size:12.5px;font-weight:500;opacity:.7;transition:.15s;border:none;background:none;color:#fff;width:100%;text-align:left}
-.sb-nav:hover{background:rgba(255,255,255,.12);opacity:1}
-.sb-nav.done{opacity:1;color:#6ee7b7}
-.sb-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.32);flex-shrink:0;transition:.2s}
+.sb-nav:hover{background:#e5f0fa;opacity:1}
+.sb-nav.done{opacity:1;color:#3a6fa8;font-weight:600}
+.sb-dot{width:6px;height:6px;border-radius:50%;background:#b8d4ef;flex-shrink:0;transition:.2s}
 .sb-nav.done .sb-dot{background:var(--ok)}
 .loading-bar{position:fixed;top:0;left:0;right:0;height:3px;background:rgba(74,38,255,.15);z-index:999;overflow:hidden;display:none}
 .loading-bar.on{display:block}
 .loading-bar::after{content:'';position:absolute;left:-40%;width:40%;height:100%;background:var(--brand);animation:ldbar 1s ease-in-out infinite}
 @keyframes ldbar{to{left:100%}}
 .main{margin-left:var(--sw);flex:1;display:flex;flex-direction:column;min-height:100vh}
-.topbar{background:var(--sur);border-bottom:1px solid var(--bor);padding:0 24px;height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.topbar{background:#fff;border-bottom:1px solid #85afd6;padding:0 24px;height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40;box-shadow:0 1px 3px rgba(0,0,0,.06)}
 .bc .cur{color:var(--t1);font-weight:600;font-size:13px}
 .pw{display:flex;align-items:center;gap:8px}
 .pt{width:140px;height:5px;background:var(--sur2);border-radius:99px;overflow:hidden}
@@ -83,7 +83,7 @@ section{margin-bottom:28px}
 .cb{border-radius:4px;padding:3px 5px;font-size:9.5px;font-weight:600;line-height:1.35;height:100%}
 .cb.br{background:var(--brand-l);color:var(--brand)}.cb.gy{background:var(--sur2);color:var(--t3);font-weight:400}
 .cb.ok{background:var(--ok-b);color:var(--ok)}.cb.wn{background:var(--warn-b);color:var(--warn)}
-.day-card{background:var(--sur);border:1px solid var(--bor);border-radius:var(--rl);margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.05);overflow:hidden;transition:.2s}
+.day-card{background:#fff;border:1px solid #85afd6;border-radius:var(--rl);margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.05);overflow:hidden;transition:.2s}
 .day-card:hover{box-shadow:0 4px 14px rgba(0,0,0,.07)}
 .dch{padding:14px 18px;border-bottom:1px solid var(--bor);display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;gap:10px}
 .dchl{display:flex;align-items:center;gap:10px}
@@ -234,7 +234,7 @@ section{margin-bottom:28px}
     </div>
     <div class="tabs">
       <button class="tab on" onclick="sw('ov')">📋 개요</button>
-      <button class="tab" onclick="sw('sc')">📅 시간표</button>
+
       <button class="tab" onclick="sw('cl')">✅ 세부일정</button>
       <button class="tab" onclick="sw('lb')">📂 자료실</button>
       <button class="tab" onclick="sw('fb')">💬 교육소감</button>
@@ -270,7 +270,7 @@ section{margin-bottom:28px}
         </ul></div>
       </section>
     </div>
-    <div class="pane" id="pane-sc">
+    <div class="pane" id="pane-sc" style="display:none!important">
       <section>
         <div class="sec-h"><div class="sec-ico">📅</div><div><div class="sec-t">주간 교육 시간표</div><div class="sec-s">09:00 – 18:00</div></div></div>
         <div style="overflow-x:auto"><div id="calWrap"></div></div>
@@ -308,6 +308,15 @@ try { memoData = JSON.parse(localStorage.getItem('cx_memo_'+URL_NAME)||'{}'); } 
 function saveMemoStore(){ try{ localStorage.setItem('cx_memo_'+URL_NAME, JSON.stringify(memoData)); }catch(e){} } // {다음일차: [미완료 task 목록]}
 try { carryOver = JSON.parse(localStorage.getItem('cx_carry_'+URL_NAME)||'{}'); } catch(e){}
 function saveCarry(){ try{ localStorage.setItem('cx_carry_'+URL_NAME, JSON.stringify(carryOver)); }catch(e){} }
+
+function removeCarry(day, taskId){
+  if(!carryOver[day]) return;
+  carryOver[day] = carryOver[day].filter(function(c){ return c.taskId !== taskId; });
+  if(!carryOver[day].length) delete carryOver[day];
+  saveCarry();
+  buildCards();
+  toast('미완료 항목이 원복됐어요','ok');
+}
 
 function loading(on){ document.getElementById('lbar').classList.toggle('on', on); }
 function setSyncDot(s){ var d=document.getElementById('syncDot'); d.className='sync-dot'+(s==='syncing'?' syncing':s==='synced'?' synced':''); }
@@ -349,7 +358,7 @@ function getWorkdays(startStr, count){
 function makeTaskId(t, i){ return (t['일차']||'')+'_'+(t['순서']||i); }
 
 function sw(id){
-  document.querySelectorAll('.tab').forEach(function(t,i){ t.classList.toggle('on', ['ov','sc','cl','lb','fb'][i]===id); });
+  document.querySelectorAll('.tab').forEach(function(t,i){ t.classList.toggle('on', ['ov','cl','lb','fb'][i]===id); });
   document.querySelectorAll('.pane').forEach(function(p){ p.classList.remove('on'); });
   document.getElementById('pane-'+id).classList.add('on');
   if(id==='fb'){
@@ -687,7 +696,11 @@ function buildCards(){
         cmb.textContent=cMemoHas?'메모 ✓':'메모';
         cmb.onclick=function(e){ e.stopPropagation(); clickMemoBtn(taskId); };
 
-        citem.appendChild(ccb); citem.appendChild(ctb); citem.appendChild(cmb);
+        var cxbtn=document.createElement('button');
+        cxbtn.style.cssText='flex-shrink:0;padding:1px 6px;border-radius:5px;border:0.5px solid #fca5a5;background:transparent;cursor:pointer;font-size:9px;color:#ef4444;margin-top:2px;margin-left:4px';
+        cxbtn.textContent='원복';
+        (function(d, tid){ cxbtn.onclick=function(e){ e.stopPropagation(); removeCarry(day, tid); }; })(day, taskId);
+        citem.appendChild(ccb); citem.appendChild(ctb); citem.appendChild(cmb); citem.appendChild(cxbtn);
 
         citem.addEventListener('click',function(e){
           if(e.target.classList.contains('tlink')) return;
@@ -916,6 +929,10 @@ function saveMemoBtn(taskId){
     var eb = document.createElement('button'); eb.className='memo-edit'; eb.textContent='수정';
     eb.onclick = function(){ editMemoBtn(taskId); };
     bubble.appendChild(pin); bubble.appendChild(txt); bubble.appendChild(eb);
+    var delBtn=document.createElement('button'); delBtn.className='memo-edit'; delBtn.textContent='삭제';
+    delBtn.style.color='#ef4444';
+    (function(tid){ delBtn.onclick=function(){ deleteMemoBtn(tid); }; })(taskId);
+    bubble.appendChild(delBtn);
     view.innerHTML=''; view.appendChild(bubble);
   }
   var form = document.getElementById('mf-'+taskId);
@@ -936,6 +953,21 @@ function editMemoBtn(taskId){
 function cancelMemoBtn(taskId){
   var form = document.getElementById('mf-'+taskId);
   if(form) form.classList.remove('open');
+}
+
+function deleteMemoBtn(taskId){
+  if(!confirm('메모를 삭제할까요?')) return;
+  delete memoData[taskId];
+  saveMemoStore();
+  var btn=document.getElementById('mb-'+taskId);
+  if(btn){ btn.textContent='메모'; btn.classList.remove('has-memo'); }
+  var view=document.getElementById('mv-'+taskId);
+  if(view){ view.classList.remove('open'); view.innerHTML=''; }
+  var form=document.getElementById('mf-'+taskId);
+  var ta=document.getElementById('mta-'+taskId);
+  if(ta) ta.value='';
+  if(form) form.classList.remove('open');
+  toast('메모가 삭제됐어요','ok');
 }
 
 function makeMemoHtml(taskId){
@@ -983,8 +1015,14 @@ function makeMemoHtml(taskId){
     var editBtn = document.createElement('button');
     editBtn.className = 'memo-edit';
     editBtn.textContent = '수정';
-    editBtn.onclick = function(){ editMemoBtn(taskId); };
+    (function(tid){ editBtn.onclick = function(){ editMemoBtn(tid); }; })(taskId);
+    var delBtn2 = document.createElement('button');
+    delBtn2.className = 'memo-edit';
+    delBtn2.textContent = '삭제';
+    delBtn2.style.color = '#ef4444';
+    (function(tid){ delBtn2.onclick = function(){ deleteMemoBtn(tid); }; })(taskId);
     bubble.appendChild(editBtn);
+    bubble.appendChild(delBtn2);
     view.appendChild(bubble);
   }
 
