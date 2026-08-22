@@ -10,7 +10,7 @@
 :root{
   --brand:#5b8ec7;--brand-h:#3a6fa8;--brand-l:rgba(91,142,199,.08);--brand-b:rgba(91,142,199,.22);
   --t1:#111827;--t2:#4b5563;--t3:#9ca3af;
-  --bg:#f8f7ff;--sur:#fff;--sur2:#f3f4f6;--bor:#e5e7eb;
+  --bg:#f0f6fc;--sur:#fff;--sur2:#f3f4f6;--bor:#e5e7eb;
   --ok:#10b981;--ok-b:#ecfdf5;--warn:#f59e0b;--warn-b:#fffbeb;
   --sw:272px;--r:10px;--rl:14px;
 }
@@ -41,7 +41,7 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
 .sb-nav.done{opacity:1;color:#3a6fa8;font-weight:600}
 .sb-dot{width:6px;height:6px;border-radius:50%;background:#b8d4ef;flex-shrink:0;transition:.2s}
 .sb-nav.done .sb-dot{background:var(--ok)}
-.loading-bar{position:fixed;top:0;left:0;right:0;height:3px;background:rgba(74,38,255,.15);z-index:999;overflow:hidden;display:none}
+.loading-bar{position:fixed;top:0;left:0;right:0;height:3px;background:rgba(91,142,199,.15);z-index:999;overflow:hidden;display:none}
 .loading-bar.on{display:block}
 .loading-bar::after{content:'';position:absolute;left:-40%;width:40%;height:100%;background:var(--brand);animation:ldbar 1s ease-in-out infinite}
 @keyframes ldbar{to{left:100%}}
@@ -73,7 +73,7 @@ section{margin-bottom:28px}
 .mc-l{font-size:11px;color:var(--t3);font-weight:500;margin-bottom:3px}
 .mc-v{font-size:13px;font-weight:600}
 .notice{background:var(--brand-l);border:1px solid var(--brand-b);border-radius:var(--rl);padding:14px 18px}
-.notice li{display:flex;gap:7px;font-size:13px;color:#3730a3;margin-bottom:5px;line-height:1.6;list-style:none}
+.notice li{display:flex;gap:7px;font-size:13px;color:#1e4d8c;margin-bottom:5px;line-height:1.6;list-style:none}
 .notice li:last-child{margin:0}.notice li::before{content:'·';font-weight:700;flex-shrink:0}
 .cal{display:grid;grid-template-columns:62px repeat(var(--day-count,5),1fr);background:var(--sur);border:1px solid var(--bor);border-radius:var(--rl);overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.05);min-width:520px}
 .ch{background:var(--sur2);padding:8px 5px;text-align:center;font-size:11px;color:var(--t3);font-weight:500;border-bottom:1px solid var(--bor)}
@@ -225,7 +225,7 @@ section{margin-bottom:28px}
     </div>
   </div>
   <div class="content">
-    <div id="nameBanner" style="display:none;background:#fdf4ff;border:1px solid #e9d5ff;border-radius:var(--rl);padding:14px 18px;margin-bottom:12px;font-size:13px;color:#6b21a8">
+    <div id="nameBanner" style="display:none;background:#f0f6fc;border:1px solid #e5f0fa;border-radius:var(--rl);padding:14px 18px;margin-bottom:12px;font-size:13px;color:#1e4d8c">
       👤 링크에 이름이 없어요! <strong>?name=이름</strong> 형식으로 접속해주세요.<br>
       <span style="font-size:12px;opacity:.8">예시: https://youngjiyu-spec.github.io/onboarding/?name=홍길동</span>
     </div>
@@ -266,7 +266,7 @@ section{margin-bottom:28px}
           <li>가이드 문서를 함께 보며 실습을 진행하니 천천히 따라와주세요.</li>
           <li>교육 일정은 상황에 따라 조정될 수 있으며, 변경 시 미리 안내 드릴게요.</li>
           <li>실습에 필요한 계정 및 접속 정보는 해당 교육일에 안내 드릴게요.</li>
-          <li>매일 교육 후 배운 내용을 슬랙 <code style="background:#c7d2fe;color:#312e81;padding:1px 5px;border-radius:4px;font-size:10.5px">#cx_교육</code> 채널에 꼭 기재해주세요.</li>
+          <li>매일 교육 후 배운 내용을 슬랙 <code style="background:#b8d4ef;color:#1e3a5f;padding:1px 5px;border-radius:4px;font-size:10.5px">#cx_교육</code> 채널에 꼭 기재해주세요.</li>
         </ul></div>
       </section>
     </div>
@@ -685,7 +685,7 @@ function buildCards(){
         // DOM 방식으로 안전하게 생성
         var ccb = document.createElement('div'); ccb.className='carry-cb';
         var ctb = document.createElement('div'); ctb.className='tb'; ctb.style.flex='1';
-        var ctt = document.createElement('div'); ctt.className='tt'; ctt.style.color='#dc2626'; ctt.textContent='미완료';
+        var ctt = document.createElement('div'); ctt.className='tt'; ctt.style.color='#dc2626'; ctt.textContent=(ct.fromDay ? ct.fromDay : prevDayName)+' 미완료';
         var clbl = document.createElement('div'); clbl.className='carry-label tl'; clbl.textContent=ct.label;
         ctb.appendChild(ctt); ctb.appendChild(clbl);
         if(linkHtml){ var tmp=document.createElement('div'); tmp.innerHTML=linkHtml; ctb.appendChild(tmp.firstChild); }
@@ -744,18 +744,25 @@ function buildCards(){
           if(unfinishedTasks.length){
             var cbtn=document.createElement('button');
             cbtn.className='carry-btn';
-            cbtn.innerHTML='⚠️ 미완료 항목 '+unfinishedTasks.length+'개';
+            var totalCarryCount = unfinishedTasks.length + (carryOver[day]||[]).filter(function(c){ return !appData.checks[c.taskId]; }).length;
+            cbtn.innerHTML='⚠️ 미완료 항목 '+totalCarryCount+'개';
             cbtn.onclick=function(){
               var unfinished=dt.filter(function(t){
                 return t['구분']==='task' && !appData.checks[makeTaskId(t,appData.tasks.indexOf(t))];
               });
-              if(!unfinished.length){ toast('모든 항목이 완료됐어요!','ok'); return; }
+              var carryUnfinished=(carryOver[day]||[]).filter(function(c){ return !appData.checks[c.taskId]; });
+              if(!unfinished.length && !carryUnfinished.length){ toast('모든 항목이 완료됐어요!','ok'); return; }
               if(!carryOver[nextDay]) carryOver[nextDay]=[];
               unfinished.forEach(function(t){
                 var tid=makeTaskId(t,appData.tasks.indexOf(t));
                 var lks=(t['링크']||'').toString().trim();
                 var exists=carryOver[nextDay].some(function(c){ return c.taskId===tid; });
-                if(!exists) carryOver[nextDay].push({taskId:tid, label:t['내용'], time:t['시간']||'', links:lks});
+                if(!exists) carryOver[nextDay].push({taskId:tid, label:t['내용'], time:t['시간']||'', links:lks, fromDay:day});
+              });
+              // 이전에서 넘어온 미완료도 함께 넘기기
+              carryUnfinished.forEach(function(c){
+                var exists2=carryOver[nextDay].some(function(x){ return x.taskId===c.taskId; });
+                if(!exists2) carryOver[nextDay].push({taskId:c.taskId, label:c.label, links:c.links||'', fromDay:c.fromDay||day});
               });
               saveCarry();
               cbtn.innerHTML='✅ '+nextDay+'로 넘겼어요';
