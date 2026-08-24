@@ -897,6 +897,11 @@ function buildCards(){
         if(e.target.classList.contains('memo-ta')) return;
         if(e.target.closest('.memo-form')) return;
         if(e.target.closest('.memo-view')) return;
+        if(e.target.classList.contains('tt')) return;
+        if(e.target.closest('.tt')) return;
+        if(e.target.tagName==='SELECT') return;
+        if(e.target.tagName==='INPUT') return;
+        if(e.target.tagName==='BUTTON') return;
         var nw=!appData.checks[taskId];
         appData.checks[taskId]=nw;
         item.classList.toggle('ck',nw);
