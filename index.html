@@ -27,7 +27,7 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
 .sb-wd{font-size:11.5px;color:#888;line-height:1.7}
 .sb-div{height:1px;background:#b8d4ef;margin:12px 16px}
 .sb-sec{padding:0 14px 14px}
-.sb-slbl{font-size:10px;font-weight:700;color:#85afd6;letter-spacing:.08em;text-transform:uppercase;padding:0 4px;margin-bottom:7px}
+.sb-slbl{font-size:10px;font-weight:700;color:#111;letter-spacing:.08em;text-transform:uppercase;padding:0 4px;margin-bottom:7px}
 .sb-co{background:rgba(255,255,255,.08);border-radius:10px;padding:12px;margin:0 2px 2px}
 .sb-co-nm{font-size:13px;font-weight:700;margin-bottom:4px}
 .sb-co-ds{font-size:11px;opacity:.76;line-height:1.7;margin-bottom:7px}
@@ -36,9 +36,9 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
 .sb-learn-item{display:flex;gap:7px;padding:5px 2px;font-size:11.5px;opacity:.84;align-items:flex-start;border-bottom:1px solid rgba(255,255,255,.07)}
 .sb-learn-item:last-child{border:none}
 .sb-ln{width:16px;height:16px;border-radius:50%;background:rgba(255,255,255,.15);font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
-.sb-nav{display:flex;align-items:center;gap:7px;padding:6px 8px;border-radius:var(--r);cursor:pointer;font-size:12.5px;font-weight:500;opacity:.7;transition:.15s;border:none;background:none;color:#fff;width:100%;text-align:left}
+.sb-nav{display:flex;align-items:center;gap:7px;padding:6px 8px;border-radius:var(--r);cursor:pointer;font-size:12.5px;font-weight:500;opacity:.9;transition:.15s;border:none;background:none;color:#111;width:100%;text-align:left}
 .sb-nav:hover{background:#e5f0fa;opacity:1}
-.sb-nav.done{opacity:1;color:#3a6fa8;font-weight:600}
+.sb-nav.done{opacity:1;color:#111;font-weight:600}
 .sb-dot{width:6px;height:6px;border-radius:50%;background:#b8d4ef;flex-shrink:0;transition:.2s}
 .sb-nav.done .sb-dot{background:var(--ok)}
 .loading-bar{position:fixed;top:0;left:0;right:0;height:3px;background:rgba(91,142,199,.15);z-index:999;overflow:hidden;display:none}
@@ -103,7 +103,7 @@ section{margin-bottom:28px}
 .ti.ck .tcb{background:var(--brand);border-color:var(--brand)}
 .ti.ck .tcb::after{content:'';width:8px;height:5px;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(-45deg) translateY(-1px);display:block}
 .tb{flex:1;min-width:0}
-.tt{font-size:10px;font-weight:600;color:var(--brand);margin-bottom:1px}
+.tt{font-size:13px;font-weight:600;color:var(--brand);margin-bottom:2px}
 .tl{font-size:13px;color:var(--t1);line-height:1.5;transition:.15s}
 .ti.ck .tl{color:var(--t3);text-decoration:line-through}
 .tlinks{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
@@ -298,7 +298,7 @@ section{margin-bottom:28px}
 </div>
 </div>
 <script>
-var SHEET_API_URL = "https://script.google.com/macros/s/AKfycbwvAECFjscszKy4E_v2YYEJ2GXtYQpR01Dv6IBUeOwFJUNASis_m3C8p8c4Cselg2Xs/exec";
+var SHEET_API_URL = "https://script.google.com/macros/s/AKfycbywxP_o3NqYhyo7r3w_YVMdkvIDHykxv1GRK1djNGz5bieiu0LIW7zo4iiQoXjOjpld/exec";
 var URL_NAME = (function(){ var p = new URLSearchParams(window.location.search); return p.get('name') || ''; })();
 var URL_START = (function(){ var p = new URLSearchParams(window.location.search); return p.get('start') || ''; })();
 var appData = {config:{}, tasks:[], checks:{}, library:[], holidays:[]};
@@ -741,16 +741,17 @@ function buildCards(){
           var unfinishedTasks=dt.filter(function(t){
             return t['구분']==='task' && !appData.checks[makeTaskId(t,appData.tasks.indexOf(t))];
           });
-          if(unfinishedTasks.length){
+          var carryUnfinishedCheck=(carryOver[day]||[]).filter(function(c){ return !appData.checks[c.taskId]; });
+          if(unfinishedTasks.length || carryUnfinishedCheck.length){
             var cbtn=document.createElement('button');
             cbtn.className='carry-btn';
-            var totalCarryCount = unfinishedTasks.length + (carryOver[day]||[]).filter(function(c){ return !appData.checks[c.taskId]; }).length;
+            var totalCarryCount = unfinishedTasks.length + carryUnfinishedCheck.length;
             cbtn.innerHTML='⚠️ 미완료 항목 '+totalCarryCount+'개';
             cbtn.onclick=function(){
               var unfinished=dt.filter(function(t){
                 return t['구분']==='task' && !appData.checks[makeTaskId(t,appData.tasks.indexOf(t))];
               });
-              var carryUnfinished=(carryOver[day]||[]).filter(function(c){ return !appData.checks[c.taskId]; });
+              var carryUnfinished=carryUnfinishedCheck;
               if(!unfinished.length && !carryUnfinished.length){ toast('모든 항목이 완료됐어요!','ok'); return; }
               if(!carryOver[nextDay]) carryOver[nextDay]=[];
               unfinished.forEach(function(t){
@@ -833,9 +834,51 @@ function buildCards(){
       // DOM 방식으로 안전하게 생성
       var tcb = document.createElement('div'); tcb.className='tcb';
       var tb = document.createElement('div'); tb.className='tb';
-      var tt = document.createElement('div'); tt.className='tt'; tt.textContent=t['시간'];
+      var tt = document.createElement('div'); tt.className='tt';
+      tt.style.cursor='pointer';
+      tt.innerHTML=t['시간']+'<span style="margin-left:3px;font-size:10px;opacity:.5">✏️</span>';
+      var timeEditWrap=document.createElement('div');
+      timeEditWrap.style.cssText='display:none;margin-bottom:4px;flex-wrap:wrap;gap:4px';
+      var timeInput=document.createElement('input');
+      timeInput.type='text'; timeInput.value=t['시간'];
+      timeInput.style.cssText='font-size:11px;padding:3px 8px;border:1px solid var(--brand);border-radius:6px;width:120px;color:#111';
+      var timeSelect=document.createElement('select');
+      timeSelect.style.cssText='font-size:11px;padding:3px 6px;border:1px solid var(--brand);border-radius:6px;color:#111;background:white';
+      ['종료시간 선택','09:00','09:10','09:20','09:30','09:40','09:45','09:50','10:00','10:10','10:20','10:30','10:40','10:45','10:50','11:00','11:10','11:20','11:30','11:40','11:45','11:50','12:00','12:30','13:00','13:30','14:00','14:10','14:30','14:45','15:00','15:10','15:30','15:45','16:00','16:10','16:30','16:45','17:00','17:10','17:30','17:45','18:00'].forEach(function(o){
+        var opt=document.createElement('option'); opt.value=o; opt.textContent=o; timeSelect.appendChild(opt);
+      });
+      var tSaveBtn=document.createElement('button');
+      tSaveBtn.textContent='저장'; tSaveBtn.style.cssText='padding:3px 10px;background:var(--brand);color:white;border:none;border-radius:6px;font-size:11px;cursor:pointer';
+      var tCancelBtn=document.createElement('button');
+      tCancelBtn.textContent='취소'; tCancelBtn.style.cssText='padding:3px 8px;background:white;border:1px solid var(--bor);border-radius:6px;font-size:11px;cursor:pointer';
+      timeEditWrap.appendChild(timeInput); timeEditWrap.appendChild(timeSelect);
+      timeEditWrap.appendChild(tSaveBtn); timeEditWrap.appendChild(tCancelBtn);
+      (function(tObj, ttEl, editWrap, sel, inp){
+        ttEl.onclick=function(e){ e.stopPropagation(); ttEl.style.display='none'; editWrap.style.display='flex'; inp.value=tObj['시간']; };
+        sel.onchange=function(){
+          if(sel.value!=='종료시간 선택'){
+            var cur=inp.value.split('–')[0].trim();
+            inp.value=cur+'–'+sel.value;
+          }
+        };
+        tSaveBtn.onclick=function(e){
+          e.stopPropagation();
+          var newTime=inp.value.trim();
+          if(!newTime) return;
+          tObj['시간']=newTime;
+          ttEl.innerHTML=newTime+'<span style="margin-left:3px;font-size:10px;opacity:.5">✏️</span>';
+          ttEl.style.display='block'; editWrap.style.display='none';
+          // 이후 항목 시간 재계산
+          var dayTasks=appData.tasks.filter(function(x){ return x['일차']===tObj['일차']; });
+          var localIdx=dayTasks.indexOf(tObj);
+          if(localIdx>=0) recalcTimes(dayTasks, localIdx);
+          pushTimeUpdate(tObj['일차'], tObj['순서'], newTime);
+          buildCards();
+        };
+        tCancelBtn.onclick=function(e){ e.stopPropagation(); ttEl.style.display='block'; editWrap.style.display='none'; };
+      })(t, tt, timeEditWrap, timeSelect, timeInput);
       var tl = document.createElement('div'); tl.className='tl'; tl.textContent=t['내용'];
-      tb.appendChild(tt); tb.appendChild(tl);
+      tb.appendChild(tt); tb.appendChild(timeEditWrap); tb.appendChild(tl);
       if(linkHtml){ var ltmp=document.createElement('div'); ltmp.innerHTML=linkHtml; tb.appendChild(ltmp.firstChild); }
 
       var memobtn = document.createElement('button');
@@ -898,6 +941,58 @@ function submitFeedback(fbId, day){
       toast('제출 실패. 다시 시도해주세요','err');
     }
   });
+}
+
+// 시간 문자열 → 분으로 변환 (예: "09:30" → 570)
+function timeToMin(t){
+  if(!t) return 0;
+  var s=t.trim().split(':');
+  return parseInt(s[0])*60+parseInt(s[1]||0);
+}
+// 분 → 시간 문자열 (예: 570 → "09:30")
+function minToTime(m){
+  if(m>=1080) m=1080; // 18:00 최대
+  var h=Math.floor(m/60), min=m%60;
+  return String(h).padStart(2,'0')+':'+String(min).padStart(2,'0');
+}
+// 시간 범위 문자열 파싱 (예: "09:00–10:30" → {start:540, end:630})
+function parseTimeRange(t){
+  if(!t) return null;
+  var sep=t.indexOf('–')>=0?'–':'-';
+  var parts=t.split(sep);
+  if(parts.length<2) return null;
+  return {start:timeToMin(parts[0].trim()), end:timeToMin(parts[1].trim())};
+}
+// 시트에 시간 저장
+function pushTimeUpdate(day, seq, newTime){
+  jsonpFetch(SHEET_API_URL+'?action=updateTime&day='+encodeURIComponent(day)+'&seq='+encodeURIComponent(seq)+'&time='+encodeURIComponent(newTime),
+    function(r){ if(r&&r.ok){ toast('시간이 저장됐어요','ok'); } else { toast('저장 실패','err'); } },
+    function(){ toast('저장 실패','err'); }
+  );
+}
+// 특정 항목 이후 시간 자동 재계산
+function recalcTimes(tasks, changedIdx){
+  // changedIdx 이후 항목들 시간 재계산
+  var prevEnd = parseTimeRange(tasks[changedIdx]['시간']);
+  if(!prevEnd) return;
+  var cursor = prevEnd.end; // 변경된 항목의 종료 시간부터 시작
+
+  for(var i=changedIdx+1; i<tasks.length; i++){
+    var t = tasks[i];
+    if(!t['시간']) continue;
+    var dur = parseTimeRange(t['시간']);
+    if(!dur) continue;
+    var length = dur.end - dur.start; // 기존 교육 길이
+    var newStart = cursor;
+    var newEnd = newStart + length;
+    if(newEnd > 1080) newEnd = 1080; // 18:00 최대
+    if(newStart >= 1080) break;
+    var newTimeStr = minToTime(newStart)+'–'+minToTime(newEnd);
+    t['시간'] = newTimeStr;
+    cursor = newEnd;
+    // 시트에 저장
+    pushTimeUpdate(t['일차'], t['순서'], newTimeStr);
+  }
 }
 
 function autoResize(el){
