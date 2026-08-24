@@ -779,10 +779,23 @@ function buildCards(){
         var fw=document.createElement('div'); fw.className='feedback-wrap';
         var fbId='fb-'+dayId;
         // feedback DOM 방식 생성
+        // 제출 완료 여부 확인
+        var feedbackDone = false;
+        try{ feedbackDone = localStorage.getItem('cx_feedback_'+URL_NAME+'_'+day)==='1'; }catch(e){}
         var fbBtn = document.createElement('button');
-        fbBtn.className = 'feedback-btn';
-        fbBtn.textContent = '📝 오늘의 교육 소감 작성하기';
-        fbBtn.onclick = function(){ toggleFeedback(fbId); };
+        fbBtn.id = fbId+'-toggle';
+        if(feedbackDone){
+          fbBtn.className = 'feedback-btn';
+          fbBtn.textContent = '✅ 교육 소감 제출 완료';
+          fbBtn.style.background = 'var(--ok-b)';
+          fbBtn.style.color = 'var(--ok)';
+          fbBtn.style.borderColor = 'var(--ok)';
+          fbBtn.disabled = true;
+        } else {
+          fbBtn.className = 'feedback-btn';
+          fbBtn.textContent = '📝 오늘의 교육 소감 작성하기';
+          fbBtn.onclick = function(){ toggleFeedback(fbId); };
+        }
 
         var fbForm = document.createElement('div');
         fbForm.className = 'feedback-form';
@@ -941,6 +954,11 @@ function submitFeedback(fbId, day){
       if(taEl) taEl.style.display='none';
       var lbEl = taEl ? taEl.previousElementSibling : null;
       if(lbEl) lbEl.style.display='none';
+      // 제출 완료 상태 로컬스토리지 저장
+      try{ localStorage.setItem('cx_feedback_'+URL_NAME+'_'+day, '1'); }catch(e){}
+      // 버튼도 완료로 변경
+      var fbToggleBtn = document.getElementById(fbId+'-toggle');
+      if(fbToggleBtn){ fbToggleBtn.textContent='✅ 교육 소감 제출 완료'; fbToggleBtn.style.background='var(--ok-b)'; fbToggleBtn.style.color='var(--ok)'; fbToggleBtn.style.borderColor='var(--ok)'; fbToggleBtn.disabled=true; }
     } else {
       if(btn){ btn.disabled=false; btn.textContent='제출하기'; }
       toast('제출 실패. 다시 시도해주세요','err');
