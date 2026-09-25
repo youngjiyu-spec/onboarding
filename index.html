@@ -342,7 +342,15 @@ function getWorkdays(startStr, count){
   var parts = startStr.split('-');
   if(parts.length < 3) return days;
   var d = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
-  var holidays = appData.holidays || [];
+  // appData.holidays 형식 변환 (Wed Jun 03 형식도 처리)
+  var rawHolidays = appData.holidays || [];
+  var holidays = rawHolidays.map(function(h){
+    var hd = new Date(h);
+    if(isNaN(hd.getTime())) return h;
+    var hm = String(hd.getMonth()+1).padStart(2,'0');
+    var hdd = String(hd.getDate()).padStart(2,'0');
+    return hd.getFullYear()+'-'+hm+'-'+hdd;
+  });
   while(days.length < count){
     var dow = d.getDay(); // 0=일, 6=토
     var mm = String(d.getMonth()+1).padStart(2,'0');
